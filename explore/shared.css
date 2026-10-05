@@ -1,0 +1,172 @@
+/* Shared foundation for the three direction explorations. Throwaway, but the tokens are
+   the starting point for the real build. Everything is rem-based so headset view can scale
+   the whole system by changing the root size. */
+
+:root {
+  color-scheme: dark;
+  --bg: oklch(0.155 0.006 60);
+  --surface-1: oklch(0.19 0.006 60);
+  --surface-2: oklch(0.23 0.007 60);
+  --surface-3: oklch(0.28 0.008 60);
+  --line: oklch(1 0 0 / 0.08);
+  --line-strong: oklch(1 0 0 / 0.16);
+  --text: oklch(0.94 0.006 80);
+  --text-2: oklch(0.76 0.008 80);
+  --text-3: oklch(0.6 0.008 80);
+  --accent: oklch(0.7 0.19 2);          /* DeoVR pink, tuned for dark ground */
+  --accent-ink: oklch(0.18 0.02 2);
+  --still: oklch(0.8 0.1 170);
+  --moving: oklch(0.82 0.13 75);
+  --scrim: oklch(0.155 0.006 60 / 0.92);
+
+  --font-ui: 'Inter', system-ui, sans-serif;
+  --font-display: 'Archivo', 'Inter', sans-serif;
+
+  --ease: cubic-bezier(.2, .7, .2, 1);
+  --d1: 150ms; --d2: 250ms; --d3: 450ms;
+
+  --target: 2.5rem;       /* min interactive size */
+  --dwell: 300ms;
+  --radius: 8px;
+  --gutter: clamp(1.25rem, 3vw, 3rem);
+  font-size: 16px;
+}
+
+/* Headset view: the whole rem system grows ~1.3x, targets grow further, dwell lengthens. */
+html[data-view="headset"] {
+  font-size: 21px;
+  --target: 3.1rem;   /* ≈ 65px */
+  --dwell: 500ms;
+  --text-2: oklch(0.82 0.008 80);
+  --text-3: oklch(0.7 0.008 80);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--text); }
+body {
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  line-height: 1.45;
+  font-feature-settings: 'cv11', 'ss01';
+  -webkit-font-smoothing: antialiased;
+}
+img, video { display: block; max-width: 100%; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; border-radius: 4px; }
+html[data-view="headset"] :focus-visible { outline-width: 3px; outline-offset: 5px; }
+.tnum { font-variant-numeric: tabular-nums; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Logo ---------- */
+.logo { display: inline-flex; align-items: center; gap: .45rem; font-weight: 700; font-size: 1.25rem; letter-spacing: -0.02em; }
+.logo svg { width: 1.35rem; height: 1.35rem; }
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  min-height: var(--target); padding: 0 1.15rem; border-radius: 999px;
+  font-weight: 600; font-size: .9375rem; white-space: nowrap;
+  transition: background var(--d1) var(--ease), transform var(--d1) var(--ease);
+}
+.btn:active { transform: scale(.97); }
+.btn svg { width: 1.1em; height: 1.1em; }
+.btn-primary { background: var(--accent); color: var(--accent-ink); }
+.btn-primary:hover { background: oklch(0.75 0.18 2); }
+.btn-secondary { background: oklch(1 0 0 / 0.1); color: var(--text); }
+.btn-secondary:hover { background: oklch(1 0 0 / 0.16); }
+.btn-ghost { color: var(--text-2); padding: 0 .75rem; }
+.btn-ghost:hover { color: var(--text); background: oklch(1 0 0 / 0.06); }
+.icon-btn { display: inline-grid; place-items: center; width: var(--target); height: var(--target); border-radius: 999px; color: var(--text-2); }
+.icon-btn:hover { color: var(--text); background: oklch(1 0 0 / 0.08); }
+.icon-btn svg { width: 1.25rem; height: 1.25rem; }
+
+/* ---------- Chips ---------- */
+.chip {
+  display: inline-flex; align-items: center; gap: .4rem;
+  min-height: calc(var(--target) - .25rem); padding: 0 .9rem; border-radius: 999px;
+  font-size: .875rem; font-weight: 500; color: var(--text-2);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+  transition: background var(--d1) var(--ease), color var(--d1) var(--ease);
+  white-space: nowrap;
+}
+.chip:hover { color: var(--text); background: oklch(1 0 0 / 0.05); }
+.chip[aria-pressed="true"], .chip[aria-selected="true"] { background: var(--text); color: var(--bg); box-shadow: none; }
+.chip svg { width: 1rem; height: 1rem; }
+
+/* ---------- Immersion Signature ---------- */
+.sig { display: flex; flex-wrap: wrap; align-items: center; gap: .25rem .7rem; font-size: .75rem; font-weight: 500; color: var(--text-2); letter-spacing: .01em; }
+.sig-item { display: inline-flex; align-items: center; gap: .3rem; white-space: nowrap; }
+.sig-item svg { width: 1rem; height: 1rem; flex: none; }
+.sig .sig-strong { color: var(--text); }
+.sig-comfort[data-c="still"] svg { color: var(--still); }
+.sig-comfort[data-c="gentle"] svg { color: var(--text-2); }
+.sig-comfort[data-c="moving"] svg { color: var(--text-2); }
+html[data-view="headset"] .sig { font-size: .8rem; gap: .35rem .9rem; }
+
+/* Expanded signature (quick view) */
+.sig-x { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 1px; background: var(--line); border-radius: var(--radius); overflow: hidden; }
+.sig-x > div { background: var(--surface-1); padding: .9rem 1rem; }
+.sig-x dt { display: flex; align-items: center; gap: .45rem; font-size: .7rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
+.sig-x dt svg { width: 1.1rem; height: 1.1rem; color: var(--text-2); }
+.sig-x dd { margin: .35rem 0 0; font-size: 1.05rem; font-weight: 600; }
+.sig-x dd small { display: block; font-size: .8rem; font-weight: 400; color: var(--text-2); margin-top: .15rem; }
+
+/* ---------- Media + previews ---------- */
+.media { position: relative; overflow: hidden; background: var(--surface-1); aspect-ratio: 5 / 3; border-radius: var(--radius); }
+.media > img, .media > video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.media > video { opacity: 0; transition: opacity var(--d3) var(--ease); }
+.media > video.is-playing { opacity: 1; }
+.badge {
+  position: absolute; z-index: 2; padding: .15rem .4rem; border-radius: 4px;
+  background: oklch(0.12 0.005 60 / 0.82); color: var(--text); font-size: .75rem; font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.badge.br { right: .5rem; bottom: .5rem; }
+.badge.tl { left: .5rem; top: .5rem; }
+
+/* ---------- Avatars ---------- */
+.avatar { width: 2rem; height: 2rem; border-radius: 999px; object-fit: cover; flex: none; background: var(--surface-2); }
+
+/* ---------- Quick view dialog ---------- */
+dialog.qv {
+  padding: 0; border: 0; color: var(--text); background: var(--surface-1);
+  width: min(56rem, 100vw - 2rem); max-height: min(92vh, 60rem); border-radius: 12px;
+  box-shadow: 0 0 0 1px var(--line);
+}
+dialog.qv::backdrop { background: oklch(0.1 0.005 60 / 0.78); }
+dialog.qv[open] { animation: qv-in var(--d3) var(--ease); }
+@keyframes qv-in { from { opacity: 0; transform: translateY(8px) scale(.99); } }
+.qv-media { aspect-ratio: 5 / 3; border-radius: 0; }
+.qv-body { padding: 1.5rem 1.75rem 1.75rem; display: grid; gap: 1.25rem; }
+.qv-title { font-family: var(--font-display); font-weight: 700; font-stretch: 85%; font-size: 1.9rem; line-height: 1.05; letter-spacing: -0.01em; margin: 0; }
+.qv-orig { color: var(--text-3); font-size: .85rem; margin-top: .4rem; }
+.qv-row { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; }
+.qv-creator { display: flex; align-items: center; gap: .6rem; font-weight: 600; }
+.qv-creator span { color: var(--text-3); font-weight: 400; }
+.qv-desc { color: var(--text-2); font-size: .9375rem; max-width: 60ch; white-space: pre-line; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.qv-warn { display: flex; gap: .5rem; align-items: center; color: var(--moving); font-size: .875rem; }
+.qv-close { position: absolute; top: .75rem; right: .75rem; z-index: 3; background: oklch(0.12 0.005 60 / 0.7); }
+.qv-note { font-size: .75rem; color: var(--text-3); }
+
+/* ---------- Toast ---------- */
+.toast {
+  position: fixed; left: 50%; bottom: 1.5rem; z-index: 100; transform: translate(-50%, 1rem); opacity: 0;
+  background: var(--text); color: var(--bg); border-radius: 999px; padding: .7rem 1.2rem; font-weight: 600; font-size: .9rem;
+  transition: opacity var(--d2) var(--ease), transform var(--d2) var(--ease); pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+html[data-view="headset"] .toast { bottom: 6.5rem; }
+
+/* ---------- Exploration toolbar (not part of the design) ---------- */
+.xtool {
+  position: fixed; right: .75rem; top: 50%; transform: translateY(-50%); z-index: 200;
+  display: grid; gap: 2px; padding: 3px; border-radius: 10px; background: oklch(0.3 0.08 250); font: 600 11px/1 var(--font-ui);
+}
+.xtool a, .xtool button { padding: 7px 8px; border-radius: 7px; color: oklch(0.9 0.03 250); text-align: center; }
+.xtool [aria-current="true"] { background: oklch(0.95 0.02 250); color: oklch(0.25 0.08 250); }
+.xtool hr { border: 0; height: 1px; background: oklch(1 0 0 / .2); margin: 2px 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; }
+}

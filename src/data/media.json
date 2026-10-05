@@ -1,0 +1,410 @@
+{
+  "3425": {
+    "eq": "/media/eq/3425.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "3428": {
+    "eq": "/media/eq/3428.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "15019": {
+    "eq": "/media/eq/15019.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "16586": {
+    "eq": "/media/eq/16586.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "18774": {
+    "eq": "/media/eq/18774.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "19088": {
+    "eq": "/media/eq/19088.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "20361": {
+    "eq": "/media/eq/20361.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "33421": {
+    "eq": "/media/eq/33421.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "43704": {
+    "eq": "/media/eq/43704.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "48898": {
+    "eq": "/media/eq/48898.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "52536": {
+    "eq": "/media/eq/52536.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "52539": {
+    "eq": "/media/eq/52539.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "53145": {
+    "eq": "/media/eq/53145.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "54590": {
+    "eq": "/media/eq/54590.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "62182": {
+    "eq": "/media/eq/62182.jpg",
+    "stereo": "sbs2l",
+    "fov": 190
+  },
+  "62471": {
+    "eq": "/media/eq/62471.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "62568": {
+    "eq": "/media/eq/62568.jpg",
+    "stereo": "sbs2l",
+    "fov": 190
+  },
+  "69469": {
+    "eq": "/media/eq/69469.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "83665": {
+    "eq": "/media/eq/83665.jpg",
+    "stereo": "mono",
+    "fov": 360
+  },
+  "96490": {
+    "eq": "/media/eq/96490.jpg",
+    "stereo": "mono",
+    "fov": 360,
+    "loop": "/media/loop/96490.mp4"
+  },
+  "104476": {
+    "eq": "/media/eq/104476.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "107622": {
+    "eq": "/media/eq/107622.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "107623": {
+    "eq": "/media/eq/107623.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "107624": {
+    "eq": "/media/eq/107624.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "111017": {
+    "eq": "/media/eq/111017.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "112783": {
+    "eq": "/media/eq/112783.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "115267": {
+    "eq": "/media/eq/115267.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "122210": {
+    "eq": "/media/eq/122210.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "123847": {
+    "eq": "/media/eq/123847.jpg",
+    "stereo": "mono",
+    "fov": 360,
+    "loop": "/media/loop/123847.mp4"
+  },
+  "124774": {
+    "eq": "/media/eq/124774.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "125075": {
+    "eq": "/media/eq/125075.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "125968": {
+    "eq": "/media/eq/125968.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "127210": {
+    "eq": "/media/eq/127210.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "128881": {
+    "eq": "/media/eq/128881.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "128882": {
+    "eq": "/media/eq/128882.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "128883": {
+    "eq": "/media/eq/128883.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "129475": {
+    "eq": "/media/eq/129475.jpg",
+    "stereo": "mono",
+    "fov": 360
+  },
+  "129914": {
+    "eq": "/media/eq/129914.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "131156": {
+    "eq": "/media/eq/131156.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "132207": {
+    "eq": "/media/eq/132207.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "132359": {
+    "eq": "/media/eq/132359.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "132429": {
+    "eq": "/media/eq/132429.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "132701": {
+    "eq": "/media/eq/132701.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "132830": {
+    "eq": "/media/eq/132830.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "132860": {
+    "eq": "/media/eq/132860.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "133186": {
+    "eq": "/media/eq/133186.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "133226": {
+    "eq": "/media/eq/133226.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "133457": {
+    "eq": "/media/eq/133457.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "133726": {
+    "eq": "/media/eq/133726.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "133898": {
+    "eq": "/media/eq/133898.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "134017": {
+    "eq": "/media/eq/134017.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "134454": {
+    "eq": "/media/eq/134454.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "134601": {
+    "eq": "/media/eq/134601.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "134609": {
+    "eq": "/media/eq/134609.jpg",
+    "stereo": "ab2l",
+    "fov": 180
+  },
+  "134699": {
+    "eq": "/media/eq/134699.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "135190": {
+    "eq": "/media/eq/135190.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "135442": {
+    "eq": "/media/eq/135442.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "135625": {
+    "eq": "/media/eq/135625.jpg",
+    "stereo": "mono",
+    "fov": 360
+  },
+  "135744": {
+    "eq": "/media/eq/135744.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "135788": {
+    "eq": "/media/eq/135788.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "136135": {
+    "eq": "/media/eq/136135.jpg",
+    "stereo": "mono",
+    "fov": 360
+  },
+  "136141": {
+    "eq": "/media/eq/136141.jpg",
+    "stereo": "mono",
+    "fov": 360
+  },
+  "136229": {
+    "eq": "/media/eq/136229.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "136246": {
+    "eq": "/media/eq/136246.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "136430": {
+    "eq": "/media/eq/136430.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "136488": {
+    "eq": "/media/eq/136488.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "136580": {
+    "eq": "/media/eq/136580.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "136607": {
+    "eq": "/media/eq/136607.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "136645": {
+    "eq": "/media/eq/136645.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "136695": {
+    "eq": "/media/eq/136695.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "137089": {
+    "eq": "/media/eq/137089.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "137110": {
+    "eq": "/media/eq/137110.jpg",
+    "stereo": "mono",
+    "fov": 360
+  },
+  "137132": {
+    "eq": "/media/eq/137132.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "137147": {
+    "eq": "/media/eq/137147.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "137356": {
+    "eq": "/media/eq/137356.jpg",
+    "stereo": "mono",
+    "fov": 360,
+    "loop": "/media/loop/137356.mp4"
+  },
+  "137557": {
+    "eq": "/media/eq/137557.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "137569": {
+    "eq": "/media/eq/137569.jpg",
+    "stereo": "mono",
+    "fov": 360
+  },
+  "137611": {
+    "eq": "/media/eq/137611.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "138381": {
+    "eq": "/media/eq/138381.jpg",
+    "stereo": "sbs2l",
+    "fov": 180
+  },
+  "138520": {
+    "eq": "/media/eq/138520.jpg",
+    "stereo": "mono",
+    "fov": 360
+  },
+  "138929": {
+    "eq": "/media/eq/138929.jpg",
+    "stereo": "mono",
+    "fov": 360
+  }
+}

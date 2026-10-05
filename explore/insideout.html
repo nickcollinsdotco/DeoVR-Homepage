@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spike B · Inside-out · DeoVR</title>
+<link rel="stylesheet" href="base.css">
+<script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js" } }</script>
+<script src="data.js"></script>
+<style>
+  html, body { height: 100%; overflow: hidden; }
+  #world { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; cursor: grab; touch-action: none; }
+  #world:active { cursor: grabbing; }
+  .scrim { position: fixed; inset: 0; pointer-events: none; z-index: 1;
+    background: linear-gradient(to bottom, oklch(0.165 0.006 60 / .75), transparent 22%),
+                linear-gradient(to top, oklch(0.165 0.006 60 / .96) 0%, oklch(0.165 0.006 60 / .8) 38%, transparent 66%); transition: opacity .5s var(--ease); }
+  .top { position: fixed; inset: 0 0 auto 0; background: transparent; z-index: 5; }
+  .here { position: fixed; z-index: 3; left: 40px; top: 120px; max-width: 640px; transition: opacity .5s var(--ease); }
+  .here .label { font-size: 13px; font-weight: 500; color: var(--text-2); display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+  .here .label .live { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+  .here h1 { font: 800 clamp(40px, 5vw, 76px)/.92 var(--display); font-variation-settings: 'wdth' 72; letter-spacing: -0.015em; margin: 0 0 16px; text-wrap: balance; text-shadow: 0 1px 24px oklch(0.165 0.006 60 / .35); }
+  .here .sig { font-size: 14px; color: var(--text); }
+  .here .actions { display: flex; gap: 10px; margin-top: 22px; }
+  .here .pill { height: 46px; padding: 0 20px; }
+  .here .pill:not(.primary) { background: oklch(0.165 0.006 60 / .7); }
+
+  .shelf { position: fixed; z-index: 3; left: 0; right: 0; bottom: 0; padding-bottom: 28px; transition: opacity .5s var(--ease), transform .5s var(--ease); }
+  .shelf-head { display: flex; align-items: center; gap: 16px; padding: 0 40px 14px; }
+  .shelf-head h2 { margin: 0; font: 600 15px/1 Inter; }
+  .row { perspective: 1400px; perspective-origin: 50% 30%; overflow-x: auto; overflow-y: visible; scrollbar-width: none; padding: 18px 40px 6px; display: flex; gap: 18px; scroll-snap-type: x proximity; }
+  .row::-webkit-scrollbar { display: none; }
+  .tile { flex: 0 0 300px; scroll-snap-align: center; transform-style: preserve-3d; transition: transform .12s linear; text-align: left; }
+  .tile .img { position: relative; aspect-ratio: 5/3; border-radius: 8px; overflow: hidden; background: var(--s1); outline: 2px solid transparent; outline-offset: 3px; transition: outline-color .2s, transform .25s var(--ease); }
+  .tile img { width: 100%; height: 100%; object-fit: cover; }
+  .tile.on .img { outline-color: var(--text); }
+  .tile h3 { margin: 10px 0 6px; font: 600 15px/1.3 Inter; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tile .sig { font-size: 12px; }
+  .dur { position: absolute; right: 8px; bottom: 8px; font: 500 12px/1 Inter; font-feature-settings: 'tnum'; padding: 4px 6px; border-radius: 4px; background: oklch(0.165 0.006 60 / .82); }
+
+  body.inside .here, body.inside .shelf, body.inside .scrim, body.inside .top { opacity: 0; pointer-events: none; }
+  body.inside .shelf { transform: translateY(40px); }
+  .inside-ui { position: fixed; z-index: 9; bottom: 32px; left: 0; right: 0; display: none; justify-content: center; gap: 10px; }
+  body.inside .inside-ui { display: flex; }
+</style>
+</head>
+<body>
+<canvas id="world"></canvas>
+<div class="scrim"></div>
+<header class="top">
+  <a class="logo" href="#"><svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3f7bff"/><stop offset=".55" stop-color="#ff4f93"/><stop offset="1" stop-color="#ff9a3d"/></linearGradient></defs><path d="M6 3.5c0-1.3 1.4-2 2.5-1.4l14 9.1c1 .7 1 2.1 0 2.8l-14 9.1C7.4 23.8 6 23 6 21.7z" fill="url(#lg)"/></svg>DeoVR</a>
+  <nav><a aria-current="page" href="#">Videos</a><a href="#">Photos</a><a href="#">Channels</a><a href="#">Passthrough</a><a href="#">Premium</a></nav>
+  <div class="search" style="background:oklch(0.165 0.006 60 / .7)">Search places, creators, moments</div>
+  <div class="actions"><button class="pill ghost">Headset view</button><button class="pill" style="background:oklch(0.165 0.006 60 / .7)">Headset queue <span class="count">0</span></button></div>
+</header>
+
+<section class="here" id="here" aria-live="polite"></section>
+<section class="shelf" aria-label="Choose where to go next">
+  <div class="shelf-head"><h2>Where next?</h2><div class="seg chips" id="intents"></div></div>
+  <div class="row" id="row"></div>
+</section>
+<div class="inside-ui"><button class="pill" id="back">Step back <span style="opacity:.6">Esc</span></button><button class="pill primary">Watch in VR</button></div>
+<div class="spike-tag">Spike B · Inside-out</div>
+
+<script type="module">
+import { videos, byId, signature, cleanTitle, dur, makeRenderer, eqTexture, videoTexture, isReady, damp, reduced } from './core.js';
+
+const W = makeRenderer(document.getElementById('world'), { alpha: false });
+const loops = {};
+function texFor(v) {
+  if (v.loop && !reduced) {
+    if (!loops[v.id]) { const el = Object.assign(document.createElement('video'), { src: v.loop, muted: true, loop: true, playsInline: true, preload: 'auto' }); loops[v.id] = videoTexture(el); }
+    loops[v.id].image.play().catch(() => {});
+    return loops[v.id];
+  }
+  return eqTexture(v);
+}
+
+const st = { cur: null, next: null, mix: 0, yaw: 0, pitch: -0.05, tyaw: 0, tpitch: -0.05, mx: 0, my: 0, drag: null, vfov: 1.35, tvfov: 1.35, fade: 0 };
+function show(v, { instant = false } = {}) {
+  if (st.cur?.v === v || st.next?.v === v) return;
+  const t = texFor(v);
+  if (!st.cur || instant) { st.cur = { v, t }; st.next = null; st.mix = 0; }
+  else { st.next = { v, t }; st.mix = 0; }
+  const ch = v.ch;
+  document.getElementById('here').innerHTML = `
+    <div class="label"><span class="live"></span>${st.next ? 'Previewing' : 'You are in'} · ${ch?.name ?? v.channel}</div>
+    <h1>${cleanTitle(v.title)}</h1>${signature(v)}
+    <div class="actions"><button class="pill primary" id="in">Step inside</button><button class="pill">Add to headset queue</button></div>`;
+  document.getElementById('in').onclick = stepIn;
+  document.querySelectorAll('.tile').forEach((t) => t.classList.toggle('on', t.dataset.id === v.id));
+}
+
+const INTENTS = [['all', 'All'], ['travel', 'Travel'], ['city', 'Cities'], ['nature', 'Nature'], ['music', 'Music'], ['adrenaline', 'Adrenaline']];
+let intent = 'all';
+document.getElementById('intents').innerHTML = INTENTS.map(([k, l]) => `<button class="chip" data-k="${k}" aria-pressed="${k === intent}">${l}</button>`).join('');
+document.getElementById('intents').onclick = (e) => { const b = e.target.closest('.chip'); if (!b) return; intent = b.dataset.k; document.querySelectorAll('#intents .chip').forEach((c) => c.setAttribute('aria-pressed', c === b)); renderRow(); };
+
+const pool = videos.filter((v) => v.eq).toSorted((a, b) => (+!!b.loop - +!!a.loop) || (b.intents.includes('travel') - a.intents.includes('travel')) || b.views - a.views);
+function renderRow() {
+  const list = pool.filter((v) => intent === 'all' || v.intents.includes(intent)).slice(0, 30);
+  const row = document.getElementById('row');
+  row.innerHTML = list.map((v) => `<button class="tile" data-id="${v.id}"><div class="img"><img src="${v.cover.sm}" alt="" loading="lazy"><span class="dur">${dur(v.durationSec)}</span></div><h3>${cleanTitle(v.title)}</h3>${signature(v, { length: false })}</button>`).join('');
+  let dwell;
+  row.querySelectorAll('.tile').forEach((t) => {
+    const v = byId[t.dataset.id];
+    const go = () => { clearTimeout(dwell); dwell = setTimeout(() => show(v), 220); };
+    t.addEventListener('pointerenter', go); t.addEventListener('focus', go);
+    t.addEventListener('pointerleave', () => clearTimeout(dwell));
+    t.addEventListener('click', () => { show(v); stepIn(); });
+  });
+  curve();
+}
+// bend the row around the viewer like a cylinder
+function curve() {
+  const cx = innerWidth / 2;
+  document.querySelectorAll('.tile').forEach((t) => {
+    const r = t.getBoundingClientRect(); const x = (r.left + r.width / 2 - cx) / cx;
+    t.style.transform = `rotateY(${x * 14}deg) translateZ(${-(Math.abs(x) ** 2) * 40}px)`;
+  });
+}
+document.getElementById('row').addEventListener('scroll', curve, { passive: true });
+addEventListener('resize', curve);
+renderRow();
+show(byId['96490'], { instant: true });
+
+function stepIn() { document.body.classList.add('inside'); st.tvfov = 1.6; }
+function stepOut() { document.body.classList.remove('inside'); st.tvfov = 1.35; }
+document.getElementById('back').onclick = stepOut;
+addEventListener('keydown', (e) => e.key === 'Escape' && stepOut());
+
+const cv = document.getElementById('world');
+addEventListener('pointermove', (e) => { st.mx = e.clientX / innerWidth - 0.5; st.my = e.clientY / innerHeight - 0.5; });
+cv.addEventListener('pointerdown', (e) => { st.drag = { x: e.clientX, y: e.clientY }; cv.setPointerCapture(e.pointerId); });
+cv.addEventListener('pointermove', (e) => { if (!st.drag) return; const k = st.vfov / innerHeight; st.tyaw -= (e.clientX - st.drag.x) * k; st.tpitch += (e.clientY - st.drag.y) * k; st.drag = { x: e.clientX, y: e.clientY }; });
+cv.addEventListener('pointerup', () => (st.drag = null));
+
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min((now - last) / 1000, 0.05); last = now;
+  const R = W.renderer, w = innerWidth, h = innerHeight;
+  if (R.domElement.width !== Math.round(w * R.getPixelRatio())) R.setSize(w, h, false);
+  if (st.next && isReady(st.next.t)) { st.mix = damp(st.mix, 1, 3.5, dt); if (st.mix > 0.995) { st.cur = st.next; st.next = null; st.mix = 0; document.querySelector('.label').childNodes[1].textContent = `You are in · ${st.cur.v.ch?.name ?? ''}`; } }
+  if (isReady(st.cur.t)) st.fade = damp(st.fade, 1, 3, dt);
+  if (!st.drag && !reduced && st.cur.v.fov >= 360) st.tyaw += dt * 0.02;
+  const lim = (v) => (v.fov >= 360 ? Infinity : Math.PI / 2 - 0.75);
+  const L = Math.min(lim(st.cur.v), st.next ? lim(st.next.v) : Infinity);
+  st.tyaw = Math.max(-L, Math.min(L, st.tyaw)); st.tpitch = Math.max(-0.8, Math.min(0.8, st.tpitch));
+  st.yaw = damp(st.yaw, st.tyaw + st.mx * 0.25, 4, dt); st.pitch = damp(st.pitch, st.tpitch - st.my * 0.12, 4, dt); st.vfov = damp(st.vfov, st.tvfov, 4, dt);
+  const u = W.u;
+  u.uMapA.value = st.cur.t; u.uHalfA.value = st.cur.v.fov >= 360 ? 0 : 1;
+  u.uMapB.value = st.next?.t ?? st.cur.t; u.uHalfB.value = (st.next?.v ?? st.cur.v).fov >= 360 ? 0 : 1; u.uMix.value = st.next ? st.mix : 0;
+  u.uYaw.value = st.yaw; u.uPitch.value = st.pitch; u.uVfov.value = st.vfov; u.uAspect.value = w / h; u.uFade.value = st.fade; u.uVignette.value = 0.25; u.uSize.value.set(w, h);
+  R.setViewport(0, 0, w, h); R.clear(); R.render(W.scene, W.camera);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
