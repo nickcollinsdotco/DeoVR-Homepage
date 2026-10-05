@@ -525,3 +525,6 @@ html[data-view="headset"] .places-grid { grid-template-columns: repeat(3, minmax
 @media (prefers-reduced-motion: reduce) { .world.is-flying { transition: none; } .world-inside-ui { animation: none; } }
 html.world-open main { z-index: 70; }
 html.world-open .stage-media { isolation: auto; overflow: visible; z-index: 100; }
+.quickview-media .world-compass { right: auto; left: .9rem; }
+.quickview-media .world { z-index: 1; }
+.quickview-close { z-index: 5; }

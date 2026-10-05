@@ -37,9 +37,6 @@ export default function VideoCard({
     return registerPortal(portalKey, el, { src: still, full: video.fov >= 360 });
   }, [portalKey, still, video.fov]);
 
-  useEffect(() => {
-    if (!previewActive) setPlaying(false);
-  }, [previewActive]);
   useEffect(() => () => { if (dwellTimer.current) clearTimeout(dwellTimer.current); }, []);
 
   // Immersive videos open a look-around window (a still, user-driven, so it also runs under reduced
@@ -75,7 +72,7 @@ export default function VideoCard({
         />
         {previewActive && video.preview && <video
           key={video.slug}
-          className={playing ? "is-playing" : ""}
+          className={playing && previewActive ? "is-playing" : ""}
           src={video.preview}
           muted
           playsInline

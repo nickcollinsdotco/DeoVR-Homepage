@@ -1,12 +1,15 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import type { Video } from "@/lib/catalog";
-import { channelFor, cleanTitle, formatCount, getSimilarVideos, stageLoopFor } from "@/lib/catalog";
+import { channelFor, cleanTitle, equirectFor, formatCount, getSimilarVideos, stageLoopFor } from "@/lib/catalog";
 import { useAppState } from "@/components/AppProviders";
 import ImmersionSignature from "@/components/ImmersionSignature";
 import { Icon } from "@/components/Icons";
+import WorldStage from "@/components/immersive/WorldStage";
+
+const noop = () => {};
 
 export default function QuickView({
   video,
@@ -22,9 +25,9 @@ export default function QuickView({
   onFeedback: (message: string) => void;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const [previewing, setPreviewing] = useState(false);
-  const [playing, setPlaying] = useState(false);
   const { contains, toggle } = useAppState();
+  const still = video ? equirectFor(video) : undefined;
+  const source = useMemo(() => video && still ? { key: video.slug, full: video.fov >= 360, still, loop: stageLoopFor(video) } : null, [video, still]);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -32,12 +35,11 @@ export default function QuickView({
     if (video) {
       if (!dialog.open) {
         try { dialog.showModal(); } catch { /* Already in a browser-managed open state. */ }
+        dialog.querySelector<HTMLButtonElement>(".quickview-close")?.focus();
       }
-      setPreviewing(Boolean(stageLoopFor(video) && !window.matchMedia("(prefers-reduced-motion: reduce)").matches));
     } else if (dialog.open) {
       dialog.close();
     }
-    setPlaying(false);
   }, [video]);
 
   if (!video) return <dialog ref={dialogRef} className="quickview-dialog" aria-label="Video details" />;
@@ -57,7 +59,7 @@ export default function QuickView({
     >
       <div className="quickview-media">
         <Image src={video.cover.lg || video.cover.sm} alt="" fill sizes="(min-width: 1000px) 960px, 100vw" unoptimized />
-        {previewing && stageLoopFor(video) && <video key={video.slug} className={playing ? "is-playing" : ""} src={stageLoopFor(video)} muted autoPlay playsInline loop preload="none" aria-hidden="true" onPlaying={() => setPlaying(true)} onError={() => setPlaying(false)} />}
+        {source && <WorldStage source={source} inside={false} title={cleanTitle(video.title)} watchHref={`https://deovr.com/${video.slug}`} onExit={noop} />}
         <button className="quickview-close" type="button" onClick={() => dialogRef.current?.close()} aria-label="Close video details"><Icon name="close" /></button>
       </div>
       <div className="quickview-body">

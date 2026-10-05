@@ -9,8 +9,9 @@ Every VR video is a window to somewhere. The homepage is a **Viewfinder**: a fea
 
 ## Design rules
 - **Content is the colour.** Chrome is neutral warm near-black. One accent (DeoVR pink) for primary action / selection only. The blue→pink→orange brand gradient appears only in the logo.
-- **Banned**: purple/blue AI gradients, glassmorphism, glow effects, gold "premium", floating 3D objects, giant rounded cards, decorative animation, pure `#000` backgrounds, pure `#fff` text, thin font weights.
+- **Banned**: purple/blue AI gradients, glassmorphism, glow effects, gold "premium", decorative 3D (floating objects, 3D for its own sake), giant rounded cards, decorative animation, pure `#000` backgrounds, pure `#fff` text, thin font weights.
 - **Type**: Inter for UI/body (weights 400/500/600, `tnum` for numbers). Archivo (variable width) for display only at large sizes.
+- **3D only to show the content's real geometry** (equirect worlds, portals, little planets, WebXR on request). See design-direction §14.
 - **Depth via light and scale**, not shadows/blur. Radii: 8px cards, pill chips/buttons only.
 - **Immersion Signature is consistent everywhere**: same order (FOV · depth · clarity/fps · comfort · length), same glyphs. Never glyph-only in headset view.
 - **Focus is preview**: dwell or keyboard focus on a featured alternate selects the stage. One high-resolution loop plays at a time when one exists; otherwise show the sharp cover. Grid previews stay inside their cards. Click a card for quick view.

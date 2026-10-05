@@ -332,6 +332,22 @@ The grid is container-query driven where possible; type scales with `clamp()`; t
 ---
 
 ## 13. What we're deliberately *not* doing
-- No WebXR-native homepage. A 3D spatial lobby would impress for ten seconds and slow down every choice after that. Headset view is a 2D panel optimised for the way headset browsers actually render the web.
+- No WebXR *lobby*. A 3D spatial homepage would impress for ten seconds and slow down every choice after that. Headset view stays a 2D panel optimised for the way headset browsers render the web. WebXR appears only as an opt-in "Enter VR" on a chosen world (see §14).
 - No redesign of the video player or watch page. Quick view covers the pre-watch decision, which is the discovery problem.
 - No fabricated personalisation. "For you" is presented as the existing algorithmic feed; we don't invent AI features.
+
+---
+
+## 14. Revision (6 Oct 2026): Window, made literal
+
+After the foundation above, we prototyped two WebGL spikes (`explore/portals.html`, `explore/insideout.html`) and changed one rule: **3D is allowed when it shows the content's real geometry, never as decoration.** DeoVR serves full equirectangular source files, so the homepage can show what being there looks like instead of a flat thumbnail.
+
+What changed:
+- **Real media.** `scripts/media.mjs` extracts a left-eye equirect still per immersive video and short stage loops from DeoVR's own files, self-hosted (signed source URLs expire after 24h).
+- **Stage = a world.** The featured item is a draggable 180°/360° view with a heading compass. Alternates crossfade the world itself (from the Inside-out spike). "Step inside" expands it to the viewport; "Enter VR" (WebXR, when supported) wraps it around the viewer.
+- **Portal cards.** Hover, focus or controller dwell turns a card into a look-around window, drawn by one shared canvas behind the page. Flat or premium items keep DeoVR's preview clip.
+- **Where in the world.** 360° places drawn as little planets; the silhouette *is* the field of view. Pointing at one unwraps it.
+- **Quick view** gets the same look-around world: pre-flight means seeing the place, not just reading specs.
+- **Curation.** "For you" keeps DeoVR's ordering but leads with places; chapters are place-led.
+
+Unchanged: the grid, the Immersion Signature, quick view as the decision point, headset view, one accent, content as the colour. Motion stays user-driven (a slow idle drift on 360° stages is the only exception and is disabled under reduced motion).

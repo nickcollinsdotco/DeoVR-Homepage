@@ -4,10 +4,9 @@ import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 import type { Channel, Feed, Filters, Video } from "@/lib/catalog";
-import { DEFAULT_FILTERS, FEATURED, INTENTS, channelFor, cleanTitle, filterCatalog, filtersFromSearch, formatCount, formatDuration, getPlaces, getSimilarVideos, hasFilters, writeFiltersToUrl } from "@/lib/catalog";
+import { DEFAULT_FILTERS, FEATURED, INTENTS, cleanTitle, filterCatalog, filtersFromSearch, formatCount, getPlaces, hasFilters, writeFiltersToUrl } from "@/lib/catalog";
 import { useAppState } from "@/components/AppProviders";
 import { DeoLogo, Icon } from "@/components/Icons";
-import ImmersionSignature from "@/components/ImmersionSignature";
 import QuickView from "@/components/QuickView";
 import QueueTray from "@/components/QueueTray";
 import Stage from "@/components/Stage";
@@ -56,7 +55,6 @@ export default function DiscoveryExperience({ videos, channels }: { videos: Vide
   const searchRef = useRef<HTMLInputElement>(null);
   const headsetSearchRef = useRef<HTMLInputElement>(null);
   const filterRef = useRef<HTMLDivElement>(null);
-  const quickRef = useRef<HTMLDialogElement>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const matching = useMemo(() => filterCatalog(videos, filters), [videos, filters]);
@@ -67,6 +65,8 @@ export default function DiscoveryExperience({ videos, channels }: { videos: Vide
 
   useEffect(() => {
     const initial = filtersFromSearch(window.location.search);
+    // Hydrate URL state after mount (the page is statically prerendered).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setFilters(initial);
     const initialSlug = new URLSearchParams(window.location.search).get("v");
     if (initialSlug) setQuickVideo(videos.find((video) => video.slug === initialSlug) ?? null);
@@ -105,11 +105,11 @@ export default function DiscoveryExperience({ videos, channels }: { videos: Vide
   }, [view]);
 
   useEffect(() => () => { if (toastTimer.current) clearTimeout(toastTimer.current); }, []);
-  useEffect(() => { setVisibleCount(24); }, [filters]);
 
   const changeFilters = useCallback((patch: Partial<Filters>, historyMode: "push" | "replace" = "push") => {
     const next = { ...filters, ...patch };
     setFilters(next);
+    setVisibleCount(24);
     writeFiltersToUrl(next, historyMode);
   }, [filters]);
 
@@ -157,7 +157,8 @@ export default function DiscoveryExperience({ videos, channels }: { videos: Vide
   const categorySamples = useMemo(() => {
     const top = new Map<string, Video>();
     for (const video of videos) {
-      if (!top.has(video.channel)) top.set(video.channel, video);
+      const place = video.intents.some((intent) => intent === "travel" || intent === "nature" || intent === "city") && !video.intents.includes("stories");
+      if (place && !top.has(video.channel)) top.set(video.channel, video);
     }
     return channels
       .filter((channel) => top.has(channel.slug))
@@ -165,7 +166,7 @@ export default function DiscoveryExperience({ videos, channels }: { videos: Vide
       .slice(0, 4);
   }, [channels, videos]);
 
-  const isPlace = (video: Video) => video.intents.some((intent) => intent === "travel" || intent === "nature" || intent === "city");
+  const isPlace = (video: Video) => video.intents.some((intent) => intent === "travel" || intent === "nature" || intent === "city") && !video.intents.includes("stories") && !video.intents.includes("passthrough");
   const calmVideos = useMemo(() => videos.filter((video) => video.comfort === "still" && video.durationSec < 1500 && isPlace(video) && !FEATURED.some((item) => item.slug === video.slug)).sort((a, b) => b.views - a.views).slice(0, 4), [videos]);
   const sharpVideos = useMemo(() => videos.filter((video) => video.clarity === "8K" && video.depth === "3D" && isPlace(video) && !calmVideos.includes(video)).sort((a, b) => b.views - a.views).slice(0, 4), [videos, calmVideos]);
   const places = useMemo(() => getPlaces(videos), [videos]);
@@ -302,13 +303,6 @@ export default function DiscoveryExperience({ videos, channels }: { videos: Vide
                 <span className="creator-card-copy"><strong>{channel.name}</strong><span>{formatCount(channel.subscribers)} followers · {channel.videoCount} videos</span></span>
                 <Icon name="external" width={16} height={16} />
               </a>)}
-            </div>
-          </section>
-          <section className="category-section page-width" aria-labelledby="category-title">
-            <h2 id="category-title">Choose a direction</h2>
-            <p className="section-intro">Start with what you want to see. Refine by how you want it to feel.</p>
-            <div className="category-grid">
-              {INTENTS.filter((intent) => intent.value !== "all").map((intent, index) => <button className={`category-tile category-tone-${index}`} key={intent.value} type="button" onClick={() => { changeFilters({ intent: intent.value }); document.getElementById("discover")?.scrollIntoView({ behavior: "smooth" }); }}>{intent.label}</button>)}
             </div>
           </section>
         </>}

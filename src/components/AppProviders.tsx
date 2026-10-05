@@ -24,6 +24,8 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
       const saved = window.localStorage.getItem("deovr-headset-queue");
       if (saved) {
         const parsed: unknown = JSON.parse(saved);
+        // Hydrate from localStorage after mount (static prerender has no storage).
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         if (Array.isArray(parsed)) setQueue(parsed.filter((item): item is string => typeof item === "string"));
       }
     } catch {

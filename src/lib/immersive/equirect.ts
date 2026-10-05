@@ -43,7 +43,7 @@ void main(){
   vec3 c = sampleEq(uMapA, uHalfA, d);
   if (uMix > 0.) c = mix(c, sampleEq(uMapB, uHalfB, d), uMix);
   // little-planet silhouette: cut the sky above uCut so the shape reads as sphere (360) or dome (180)
-  float sky = mix(1., smoothstep(uCut + .025, uCut - .025, dp.y), smoothstep(.35, 1., uMorph));
+  float sky = mix(1., smoothstep(uCut + .006, uCut - .006, dp.y), smoothstep(.35, 1., uMorph));
   float v = 1. - uVignette * smoothstep(.55, 1.45, length(vUv*2. - 1.));
   c = mix(uBg, c * v, sky);
   // rounded-rect mask in device pixels (portals draw behind the DOM, so corners are clipped here)

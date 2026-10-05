@@ -135,8 +135,11 @@ export function parseDate(value: string) {
   return Number.isNaN(date.getTime()) ? new Date(0) : date;
 }
 
+const EMOJI = /[\p{Extended_Pictographic}\u{1F1E6}-\u{1F1FF}️‍]/gu;
+
 export function cleanTitle(title: string) {
   return title
+    .replace(EMOJI, " ")
     .replace(/\[[^\]]*\]/g, " ")
     .replace(/\b(VR\s?180|180°?|360°?|3D|2D|8K|7K|6K|5K|4K|60\s?FPS|HDR|VR)\b/gi, " ")
     .split(/\s[|｜]\s|\s[-–]\s(?=[A-Z0-9 ]+$)/)[0]
