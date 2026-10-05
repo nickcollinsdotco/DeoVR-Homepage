@@ -6,7 +6,7 @@
 // DeoVR serves full files via signed URLs that expire in 24h, so we self-host small derivatives.
 // Run manually after scripts/snapshot.mjs; output is committed.
 //
-//   node scripts/media.mjs [--loops id,id,id] [--force]
+//   node scripts/media.mjs [--loops id,id,id] [--force] [--only-loops]
 
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -18,6 +18,7 @@ const run = promisify(execFile);
 const ROOT = path.resolve(import.meta.dirname, '..');
 const arg = (k) => { const i = process.argv.indexOf(k); return i > 0 ? process.argv[i + 1] : undefined; };
 const FORCE = process.argv.includes('--force');
+const ONLY_LOOPS = process.argv.includes('--only-loops');
 const LOOPS = (arg('--loops') ?? '123847,135389,96490,135979,137356').split(',');
 
 const videos = JSON.parse(await fs.readFile(path.join(ROOT, 'src/data/videos.json'), 'utf8'));
@@ -59,10 +60,10 @@ async function loop(v) {
   if (!FORCE && media[v.id]?.loop) return;
   const { j, mid } = await source(v.id);
   const t = Math.round(Math.min(v.durationSec * 0.35, 90));
-  const size = v.fov === 360 ? '2560:1280' : '1600:1600';
+  const size = v.fov === 360 ? '2048:1024' : '1280:1280';
   const vf = [eyeCrop(j.stereoMode), `scale=${size}`, 'fps=30'].filter(Boolean).join(',');
-  await run(ffmpeg, ['-y', '-loglevel', 'error', '-ss', String(t), '-i', mid.url, '-t', '10', '-an', '-vf', vf,
-    '-c:v', 'libx264', '-preset', 'slow', '-crf', '27', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', path.join(ROOT, file)], { timeout: 600000 });
+  await run(ffmpeg, ['-y', '-loglevel', 'error', '-ss', String(t), '-i', mid.url, '-t', '8', '-an', '-vf', vf,
+    '-c:v', 'libx264', '-preset', 'slow', '-crf', '30', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', path.join(ROOT, file)], { timeout: 600000 });
   media[v.id] = { ...media[v.id], loop: '/' + file.replace('public/', '') };
   console.log('loop', v.id, v.title.slice(0, 50));
 }
@@ -75,7 +76,7 @@ async function pool(items, n, fn) {
 }
 
 const immersive = videos.filter((v) => v.fov >= 180);
-await pool(immersive, 6, still);
+if (!ONLY_LOOPS) await pool(immersive, 6, still);
 await fs.writeFile(outFile, JSON.stringify(media, null, 2));
 await pool(videos.filter((v) => LOOPS.includes(v.id)), 2, loop);
 await fs.writeFile(outFile, JSON.stringify(media, null, 2));

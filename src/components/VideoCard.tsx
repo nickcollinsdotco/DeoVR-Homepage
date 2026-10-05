@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import type { Video } from "@/lib/catalog";
-import { channelFor, cleanTitle, formatAge, formatCount, formatDuration } from "@/lib/catalog";
+import { channelFor, cleanTitle, equirectFor, formatAge, formatCount, formatDuration } from "@/lib/catalog";
+import { pointerToPortal, registerPortal, setPortalActive } from "@/lib/immersive/portals";
 import { useAppState } from "@/components/AppProviders";
 import ImmersionSignature from "@/components/ImmersionSignature";
 import { Icon } from "@/components/Icons";
@@ -26,29 +27,45 @@ export default function VideoCard({
   const dwellTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const channel = channelFor(video);
   const queued = contains(video.slug);
+  const still = equirectFor(video);
+  const portalKey = useId();
+  const mediaRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = mediaRef.current;
+    if (!still || !el) return;
+    return registerPortal(portalKey, el, { src: still, full: video.fov >= 360 });
+  }, [portalKey, still, video.fov]);
 
   useEffect(() => {
     if (!previewActive) setPlaying(false);
   }, [previewActive]);
   useEffect(() => () => { if (dwellTimer.current) clearTimeout(dwellTimer.current); }, []);
 
-  const startDwell = () => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  // Immersive videos open a look-around window (a still, user-driven, so it also runs under reduced
+  // motion); flat or premium ones fall back to DeoVR's muted 14-second preview clip.
+  const startDwell = (fromFocus = false) => {
     if (dwellTimer.current) clearTimeout(dwellTimer.current);
+    if (still) {
+      dwellTimer.current = setTimeout(() => setPortalActive(portalKey, true, fromFocus), view === "headset" ? 450 : 160);
+      return;
+    }
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     dwellTimer.current = setTimeout(() => onPreview(video.slug), view === "headset" ? 500 : 300);
   };
   const stopDwell = () => {
     if (dwellTimer.current) clearTimeout(dwellTimer.current);
     dwellTimer.current = null;
     setPlaying(false);
-    onPreview(null);
+    if (still) setPortalActive(portalKey, false);
+    else onPreview(null);
   };
 
   return (
-    <article className="video-card" onPointerEnter={startDwell} onPointerLeave={stopDwell} onFocusCapture={startDwell} onBlurCapture={(event) => {
+    <article className="video-card" onPointerEnter={() => startDwell()} onPointerLeave={stopDwell} onFocusCapture={() => startDwell(true)} onBlurCapture={(event) => {
       if (!event.currentTarget.contains(event.relatedTarget as Node | null)) stopDwell();
     }}>
-      <div className="card-media" data-preview-host>
+      <div className="card-media" data-preview-host ref={mediaRef} onPointerMove={still ? (event) => pointerToPortal(portalKey, event) : undefined}>
         <Image
           src={video.cover.sm}
           alt=""
@@ -74,6 +91,7 @@ export default function VideoCard({
         </button>
         {video.premium && <span className="premium-badge"><Icon name="spark" />Premium</span>}
         <span className="duration-badge">{formatDuration(video.durationSec)}</span>
+        {still && <span className="look-hint" aria-hidden="true">{video.fov >= 360 ? "360°" : "180°"} · move to look around</span>}
         <button
           className="card-queue"
           type="button"

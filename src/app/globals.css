@@ -476,3 +476,52 @@ html[data-view="headset"] .feed-section { scroll-snap-type: y proximity; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* ───────── Immersive layer: worlds, portals, planets ───────── */
+/* One WebGL canvas sits *behind* the page; a card's cover fades out (--portal) to reveal it. */
+.portal-canvas { position: fixed; inset: 0; z-index: 0; width: 100vw; height: 100vh; pointer-events: none; }
+main, .site-footer { position: relative; z-index: 1; }
+.card-media[data-portal] { background: transparent; }
+.card-media > img { opacity: calc(1 - var(--portal, 0)); transition: transform 650ms var(--ease); }
+.look-hint { position: absolute; z-index: 3; left: .55rem; bottom: .55rem; padding: .3rem .5rem; border-radius: 4px; background: oklch(0.155 0.006 60 / .82); color: var(--text-2); font-size: .72rem; font-weight: 500; pointer-events: none; opacity: 0; transition: opacity var(--d2) var(--ease); }
+.card-media[data-portal] .look-hint { opacity: 1; transition-delay: 250ms; }
+.card-media[data-portal] .premium-badge, .card-media[data-portal] .card-queue { opacity: 0; }
+.video-card:hover .card-media[data-portal] .card-queue, .video-card:focus-within .card-media[data-portal] .card-queue { opacity: 1; }
+
+/* Stage world */
+.world { position: absolute; inset: 0; z-index: 1; border-radius: inherit; overflow: hidden; }
+.world-canvas { display: block; width: 100%; height: 100%; opacity: var(--world, 0); cursor: grab; touch-action: none; }
+.world-canvas:active { cursor: grabbing; }
+.world-canvas:focus-visible { outline-offset: -4px; }
+.world-compass { position: absolute; z-index: 3; top: .85rem; right: .9rem; display: flex; align-items: center; gap: .55rem; padding: .3rem .7rem .3rem .3rem; border-radius: 999px; background: oklch(0.155 0.006 60 / .62); color: var(--text); font-size: .74rem; font-weight: 500; pointer-events: none; opacity: var(--world, 0); }
+.world-compass svg { width: 1.9rem; height: 1.9rem; }
+.world-wedge { transition: none; }
+.stage-media .stage-scrim, .stage-media .stage-index, .stage-media .stage-media-foot { pointer-events: none; }
+.stage-media .stage-index, .stage-media .stage-media-foot, .stage-media .stage-scrim { z-index: 2; }
+.world.is-inside { position: fixed; z-index: 200; border-radius: var(--radius); }
+.world.is-flying { transition: top 560ms var(--ease), left 560ms var(--ease), width 560ms var(--ease), height 560ms var(--ease), border-radius 560ms var(--ease); }
+.world.is-inside .world-compass { top: 1.25rem; right: 1.25rem; }
+html.world-open { overflow: hidden; }
+.world-inside-ui { position: absolute; z-index: 4; left: 0; right: 0; bottom: 0; display: grid; justify-items: center; gap: 1rem; padding: 4rem 1.5rem 2rem; background: linear-gradient(0deg, oklch(0.155 0.006 60 / .7), transparent); animation: world-ui-in 400ms var(--ease) 350ms both; }
+.world-inside-title { margin: 0; font-family: var(--font-archivo), var(--font-inter), sans-serif; font-size: clamp(1.5rem, 2.4vw, 2.2rem); font-weight: 700; font-stretch: 86%; letter-spacing: -.03em; }
+.world-inside-actions { display: flex; gap: .6rem; }
+.world-inside-actions kbd { font: inherit; font-size: .72rem; opacity: .6; }
+@keyframes world-ui-in { from { opacity: 0; } }
+.button-icon { width: var(--target); padding: 0; }
+
+/* Where in the world: planets */
+.places-chapter { grid-column: 1 / -1; margin: 1.3rem 0 .4rem; padding: 1.7rem 0 0; border-top: 1px solid var(--line); }
+.places-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 1.15rem; margin: 0; padding: 0; list-style: none; }
+.planet-card { min-width: 0; }
+.planet-media { position: relative; display: block; width: 100%; aspect-ratio: 1; padding: 0; border: 0; border-radius: var(--radius); background: var(--surface-1); overflow: hidden; cursor: pointer; transition: transform var(--d2) var(--ease); }
+.planet-media[data-portal] { background: transparent; }
+.planet-media > img { object-fit: cover; opacity: calc(1 - var(--portal, 0)); }
+.planet-media:hover, .planet-media:focus-visible { transform: scale(1.02); }
+.planet-place { margin: .8rem 0 .15rem; font-family: var(--font-archivo), var(--font-inter), sans-serif; font-size: 1.3rem; font-weight: 700; font-stretch: 86%; letter-spacing: -.025em; line-height: 1.05; }
+.planet-meta { display: flex; gap: .35rem; margin: 0; color: var(--text-3); font-size: .78rem; }
+@media (max-width: 1119px) { .places-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 639px) { .places-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+html[data-view="headset"] .places-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5rem; }
+@media (prefers-reduced-motion: reduce) { .world.is-flying { transition: none; } .world-inside-ui { animation: none; } }
+html.world-open main { z-index: 70; }
+html.world-open .stage-media { isolation: auto; overflow: visible; z-index: 100; }

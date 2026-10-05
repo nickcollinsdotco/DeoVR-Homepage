@@ -63,13 +63,23 @@ export const DEFAULT_FILTERS: Filters = {
 export const CHANNELS = channelSnapshot as unknown as Channel[];
 
 export const FEATURED = [
-  { slug: "t2szbx", headline: "Above Mexico City", place: "Mexico City · Mexico", hook: "Rise over one of the world's largest cities, as its streets open toward the horizon." },
+  { slug: "5fy5b3", headline: "Copacabana, on foot", place: "Rio de Janeiro · Brazil", hook: "Walk from the boardwalk down to the waterline, with the whole beach turning around you." },
+  { slug: "t2szbx", headline: "Above Mexico City", place: "Mexico City · Mexico", hook: "Rise over one of the world's largest cities as its streets open toward the horizon." },
+  { slug: "3kqtes", headline: "Venice, side streets", place: "Venice · Italy", hook: "Eighteen minutes of canals, bridges and quiet corners, with the original city sound." },
   { slug: "w4fa5o", headline: "Beside the submarine", place: "Curaçao · Caribbean", hook: "Float beside a research submarine as it cruises a living Caribbean reef." },
   { slug: "ctdats", headline: "Victoria Falls & the Okavango", place: "Namibia · Botswana · Zambia", hook: "A family journey across southern Africa, in stereo 3D." },
-  { slug: "lwpscf", headline: "Manhattan, dusk", place: "New York City", hook: "A 14K timelapse as the skyline turns from day to night." },
-  { slug: "w5u3r6", headline: "Breakfast with elephants", place: "Chiang Mai, Thailand", hook: "Stand among the herd at a sanctuary, with 360° all around you." },
-  { slug: "asavt0", headline: "Over the Matterhorn glacier", place: "Zermatt, Switzerland", hook: "An FPV flight skims the ice beneath the peak." },
+  { slug: "asavt0", headline: "Over the Matterhorn glacier", place: "Zermatt · Switzerland", hook: "An FPV flight skims the ice beneath the peak." },
   { slug: "q37cfc", headline: "Fall to Earth", place: "Orbit → New York City", hook: "Ride a spacecraft from orbit down to a landing in New York, watching through the hatch." },
+];
+
+// 360° places for the "Where in the world" chapter (shown as little planets).
+export const PLACES = [
+  { slug: "jor1kn", place: "Elmina", country: "Ghana" },
+  { slug: "c2h5rl", place: "Kobe", country: "Japan" },
+  { slug: "0ycsdx", place: "Olsztyn", country: "Poland" },
+  { slug: "33zik1", place: "Cape Coast", country: "Ghana" },
+  { slug: "1rrlm5", place: "Copacabana", country: "Brazil" },
+  { slug: "ixxr53", place: "Warmia", country: "Poland" },
 ];
 
 export const INTENTS = [
@@ -84,7 +94,7 @@ export const INTENTS = [
 ];
 
 const channelBySlug = new Map(CHANNELS.map((channel) => [channel.slug, channel]));
-const localMedia = mediaSnapshot as Record<string, { loop?: string }>;
+const localMedia = mediaSnapshot as Record<string, { loop?: string; eq?: string }>;
 
 export function featuredCopy(video: Video) {
   return FEATURED.find((item) => item.slug === video.slug);
@@ -96,6 +106,19 @@ export function channelFor(video: Video) {
 
 export function stageLoopFor(video: Video) {
   return localMedia[video.id]?.loop;
+}
+
+/** Self-hosted left-eye equirect still (see scripts/media.mjs). Absent for premium/flat videos. */
+export function equirectFor(video: Video) {
+  return video.fov >= 180 ? localMedia[video.id]?.eq : undefined;
+}
+
+export function getPlaces(videos: Video[]) {
+  const bySlug = new Map(videos.map((video) => [video.slug, video]));
+  return PLACES.flatMap((place) => {
+    const video = bySlug.get(place.slug);
+    return video && equirectFor(video) ? [{ ...place, video }] : [];
+  });
 }
 
 export function getFeaturedVideos(videos: Video[]) {
@@ -171,7 +194,16 @@ export function filterCatalog(videos: Video[], filters: Filters) {
   if (filters.feed === "trending") {
     return filtered.sort((a, b) => (a.feeds.trending ?? Number.MAX_SAFE_INTEGER) - (b.feeds.trending ?? Number.MAX_SAFE_INTEGER));
   }
-  return filtered.sort((a, b) => (a.feeds.home ?? Number.MAX_SAFE_INTEGER) - (b.feeds.home ?? Number.MAX_SAFE_INTEGER));
+  return filtered.sort((a, b) => forYouScore(a) - forYouScore(b));
+}
+
+const PLACE_INTENTS = ["travel", "city", "nature"];
+/** "For you" keeps DeoVR's home ordering but leads with places, which is what VR does best. */
+function forYouScore(video: Video) {
+  const rank = video.feeds.home ?? video.feeds["top-picks"] ?? 60;
+  const place = video.intents.some((intent) => PLACE_INTENTS.includes(intent)) ? -18 : 0;
+  const portal = equirectFor(video) ? -6 : 0;
+  return rank + place + portal;
 }
 
 export function getSimilarVideos(video: Video, videos: Video[], limit = 4) {

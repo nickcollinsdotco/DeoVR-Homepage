@@ -1,63 +1,45 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Video } from "@/lib/catalog";
-import { channelFor, FEATURED, featuredCopy, formatDuration, getFeaturedVideos, stageLoopFor } from "@/lib/catalog";
+import { channelFor, equirectFor, FEATURED, featuredCopy, formatDuration, getFeaturedVideos, stageLoopFor } from "@/lib/catalog";
 import { useAppState } from "@/components/AppProviders";
 import ImmersionSignature from "@/components/ImmersionSignature";
 import { DeoMark, Icon } from "@/components/Icons";
+import WorldStage from "@/components/immersive/WorldStage";
 
 export default function Stage({
   videos,
   selected,
-  previewActive,
   onSelect,
   onOpen,
-  onPreview,
   onFeedback,
 }: {
   videos: Video[];
   selected: Video;
-  previewActive: boolean;
   onSelect: (video: Video) => void;
   onOpen: (video: Video) => void;
-  onPreview: (slug: string | null) => void;
   onFeedback: (message: string) => void;
 }) {
   const { contains, toggle } = useAppState();
-  const [playing, setPlaying] = useState(false);
-  const dwellTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [inside, setInside] = useState(false);
+  const stepInRef = useRef<HTMLButtonElement>(null);
   const alternateTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const alternates = useMemo(() => getFeaturedVideos(videos), [videos]);
   const copy = featuredCopy(selected);
-  const stageLoop = stageLoopFor(selected);
   const channel = channelFor(selected);
   const queued = contains(selected.slug);
+  const still = equirectFor(selected);
+  const source = useMemo(() => ({ key: selected.slug, full: selected.fov >= 360, still, loop: stageLoopFor(selected) }), [selected, still]);
+  const exit = useCallback(() => { setInside(false); stepInRef.current?.focus({ preventScroll: true }); }, []);
 
-  useEffect(() => setPlaying(false), [selected.slug]);
-  useEffect(() => () => {
-    if (dwellTimer.current) clearTimeout(dwellTimer.current);
-    if (alternateTimer.current) clearTimeout(alternateTimer.current);
-  }, []);
-
-  const startDwell = () => {
-    if (!stageLoop) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    if (dwellTimer.current) clearTimeout(dwellTimer.current);
-    dwellTimer.current = setTimeout(() => onPreview(selected.slug), 350);
-  };
-  const stopDwell = () => {
-    if (dwellTimer.current) clearTimeout(dwellTimer.current);
-    dwellTimer.current = null;
-    setPlaying(false);
-    onPreview(null);
-  };
+  useEffect(() => () => { if (alternateTimer.current) clearTimeout(alternateTimer.current); }, []);
 
   return (
     <section className="stage-section page-width" aria-labelledby="stage-title">
       <div className="stage-layout" id="stage-featured-panel" role="tabpanel" aria-labelledby={`stage-alt-${selected.slug}`}>
-        <div className="stage-media" data-preview-host onPointerEnter={startDwell} onPointerLeave={stopDwell} onFocusCapture={startDwell} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) stopDwell(); }}>
+        <div className="stage-media">
           <Image
             key={selected.slug}
             src={selected.cover.lg || selected.cover.sm}
@@ -67,19 +49,7 @@ export default function Stage({
             priority
             unoptimized
           />
-          {previewActive && stageLoop && <video
-            key={`stage-${selected.slug}`}
-            className={playing ? "is-playing" : ""}
-            src={stageLoop}
-            muted
-            playsInline
-            loop
-            autoPlay
-            preload="none"
-            aria-hidden="true"
-            onPlaying={() => setPlaying(true)}
-            onError={() => setPlaying(false)}
-          />}
+          {still && <WorldStage source={source} inside={inside} title={copy?.headline ?? selected.title} watchHref={`https://deovr.com/${selected.slug}`} onExit={exit} />}
           <div className="stage-scrim" />
           <div className="stage-index"><span className="stage-index-mark"><DeoMark /></span><span>Experience no. {String(Math.max(1, FEATURED.findIndex((item) => item.slug === selected.slug) + 1)).padStart(2, "0")}</span></div>
           <div className="stage-media-foot">
@@ -99,12 +69,15 @@ export default function Stage({
             <span>{channel?.name ?? selected.channel}</span>
           </div>
           <div className="stage-actions">
-            <a className="button button-primary" href={`https://deovr.com/${selected.slug}`} target="_blank" rel="noreferrer"><Icon name="play" />Watch in DeoVR</a>
-            <button className="button button-outline" type="button" aria-pressed={queued} onClick={() => {
+            {still
+              ? <button ref={stepInRef} className="button button-primary" type="button" onClick={() => setInside(true)}><Icon name="headset" />Step inside</button>
+              : <a className="button button-primary" href={`https://deovr.com/${selected.slug}`} target="_blank" rel="noreferrer"><Icon name="play" />Watch in VR</a>}
+            {still && <a className="button button-outline" href={`https://deovr.com/${selected.slug}`} target="_blank" rel="noreferrer"><Icon name="play" />Watch in VR</a>}
+            <button className="button button-outline button-icon" type="button" aria-pressed={queued} title={queued ? "In your headset queue" : "Add to headset queue"} onClick={() => {
               toggle(selected.slug);
               onFeedback(queued ? "Removed from your headset queue." : "Added to headset queue.");
-            }}><Icon name={queued ? "check" : "queue"} />{queued ? "Queued" : "Headset queue"}</button>
-            <button className="button button-quiet" type="button" onClick={() => onOpen(selected)}>Details</button>
+            }}><Icon name={queued ? "check" : "queue"} /><span className="sr-only">{queued ? "Queued" : "Add to headset queue"}</span></button>
+            <button className="button button-outline button-icon" type="button" onClick={() => onOpen(selected)} title="Details"><Icon name="more" /><span className="sr-only">Details</span></button>
           </div>
         </div>
       </div>
@@ -122,22 +95,14 @@ export default function Stage({
             aria-current={selected.slug === video.slug ? "true" : undefined}
             aria-controls="stage-featured-panel"
             onClick={() => onSelect(video)}
-            onFocus={() => {
-              onSelect(video);
-              onPreview(stageLoopFor(video) && !window.matchMedia("(prefers-reduced-motion: reduce)").matches ? video.slug : null);
-            }}
-            onBlur={() => onPreview(null)}
+            onFocus={() => onSelect(video)}
             onPointerEnter={() => {
               if (alternateTimer.current) clearTimeout(alternateTimer.current);
-              alternateTimer.current = setTimeout(() => {
-                onSelect(video);
-                onPreview(stageLoopFor(video) ? video.slug : null);
-              }, 220);
+              alternateTimer.current = setTimeout(() => onSelect(video), 220);
             }}
             onPointerLeave={() => {
               if (alternateTimer.current) clearTimeout(alternateTimer.current);
               alternateTimer.current = null;
-              onPreview(null);
             }}
             onKeyDown={(event) => {
               if (!["ArrowRight", "ArrowLeft"].includes(event.key)) return;

@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 import type { Channel, Feed, Filters, Video } from "@/lib/catalog";
-import { DEFAULT_FILTERS, FEATURED, INTENTS, channelFor, cleanTitle, filterCatalog, filtersFromSearch, formatCount, formatDuration, getSimilarVideos, hasFilters, writeFiltersToUrl } from "@/lib/catalog";
+import { DEFAULT_FILTERS, FEATURED, INTENTS, channelFor, cleanTitle, filterCatalog, filtersFromSearch, formatCount, formatDuration, getPlaces, getSimilarVideos, hasFilters, writeFiltersToUrl } from "@/lib/catalog";
 import { useAppState } from "@/components/AppProviders";
 import { DeoLogo, Icon } from "@/components/Icons";
 import ImmersionSignature from "@/components/ImmersionSignature";
@@ -12,6 +12,8 @@ import QuickView from "@/components/QuickView";
 import QueueTray from "@/components/QueueTray";
 import Stage from "@/components/Stage";
 import VideoCard from "@/components/VideoCard";
+import PortalCanvas from "@/components/immersive/PortalCanvas";
+import PlacesChapter from "@/components/immersive/PlacesChapter";
 
 const FILTER_GROUPS = [
   { key: "fov", label: "Field of view", options: [["180", "180°"], ["360", "360°"]] },
@@ -118,7 +120,6 @@ export default function DiscoveryExperience({ videos, channels }: { videos: Vide
   }, []);
 
   const previewTile = useCallback((slug: string | null) => setActivePreview(slug ? { kind: "tile", slug } : null), []);
-  const previewStage = useCallback((slug: string | null) => setActivePreview(slug ? { kind: "stage", slug } : null), []);
 
   const openQuickView = useCallback((video: Video) => {
     setActivePreview(null);
@@ -164,9 +165,10 @@ export default function DiscoveryExperience({ videos, channels }: { videos: Vide
       .slice(0, 4);
   }, [channels, videos]);
 
-  const calmVideos = useMemo(() => videos.filter((video) => video.comfort === "still" && video.durationSec < 900).sort((a, b) => b.views - a.views).slice(0, 4), [videos]);
-  const sharpVideos = useMemo(() => videos.filter((video) => video.clarity === "8K" && video.depth === "3D").sort((a, b) => b.views - a.views).slice(0, 4), [videos]);
-  const destinationVideos = useMemo(() => FEATURED.map(({ slug }) => videos.find((video) => video.slug === slug)).filter((video): video is Video => Boolean(video)).slice(0, 4), [videos]);
+  const isPlace = (video: Video) => video.intents.some((intent) => intent === "travel" || intent === "nature" || intent === "city");
+  const calmVideos = useMemo(() => videos.filter((video) => video.comfort === "still" && video.durationSec < 1500 && isPlace(video) && !FEATURED.some((item) => item.slug === video.slug)).sort((a, b) => b.views - a.views).slice(0, 4), [videos]);
+  const sharpVideos = useMemo(() => videos.filter((video) => video.clarity === "8K" && video.depth === "3D" && isPlace(video) && !calmVideos.includes(video)).sort((a, b) => b.views - a.views).slice(0, 4), [videos, calmVideos]);
+  const places = useMemo(() => getPlaces(videos), [videos]);
 
   const handleGridKeys = (event: ReactKeyboardEvent<HTMLDivElement>) => {
     const target = event.target as HTMLElement;
@@ -193,6 +195,7 @@ export default function DiscoveryExperience({ videos, channels }: { videos: Vide
 
   return (
     <>
+      <PortalCanvas />
       <a className="skip-link" href="#discover">Skip to videos</a>
       <header className="site-topbar">
         <div className="topbar-inner page-width">
@@ -227,7 +230,7 @@ export default function DiscoveryExperience({ videos, channels }: { videos: Vide
       </header>
 
       <main id="top">
-        <Stage videos={videos} selected={stageVideo} previewActive={activePreview?.kind === "stage" && activePreview.slug === stageVideo.slug} onSelect={(video) => { setActivePreview(null); setStageVideo(video); }} onOpen={openQuickView} onPreview={previewStage} onFeedback={announce} />
+        <Stage videos={videos} selected={stageVideo} onSelect={(video) => { setActivePreview(null); setStageVideo(video); }} onOpen={openQuickView} onFeedback={announce} />
 
         <section className="discovery-shell" id="discover" aria-label="Discover videos">
           <form className="headset-search-shell page-width" role="search" onSubmit={(event) => { event.preventDefault(); headsetSearchRef.current?.blur(); }}>
@@ -279,7 +282,7 @@ export default function DiscoveryExperience({ videos, channels }: { videos: Vide
 
             {shown.slice(clean ? 8 : shown.length, clean ? 16 : shown.length).map((video) => <div data-video-slug={video.slug} key={video.slug}><VideoCard video={video} previewActive={previewSlug === video.slug} onOpen={openQuickView} onPreview={previewTile} onFeedback={announce} /></div>)}
 
-            {clean && destinationVideos.length > 0 && <EditorialChapter title="Open the world a little wider" description="Move from city streets to coastlines and mountain air." action="Explore travel" onAction={() => changeFilters({ intent: "travel" })} videos={destinationVideos} previewSlug={previewSlug} onOpen={openQuickView} onPreview={previewTile} onFeedback={announce} />}
+            {clean && <PlacesChapter places={places} onOpen={openQuickView} />}
 
             {shown.slice(clean ? 16 : shown.length, visibleCount).map((video) => <div data-video-slug={video.slug} key={video.slug}><VideoCard video={video} previewActive={previewSlug === video.slug} onOpen={openQuickView} onPreview={previewTile} onFeedback={announce} />{previewSlug === video.slug && <span className="sr-only" aria-live="polite">Previewing {cleanTitle(video.title)}</span>}</div>)}
 
