@@ -14,7 +14,7 @@ Companion to `docs/design-direction.md` (read that first). Last updated: 2026-10
   - Filters, feed and quick view → **URL search params** (`?feed=trending&intent=travel&fov=360&comfort=still&v=5fy5b3`), restored after hydration and on back/forward.
   - Headset queue + view mode → React context persisted to `localStorage` (`AppProviders`).
   - Portals → a tiny module-level registry (`lib/immersive/portals.ts`) that cards write to and one canvas reads from, so cards never import three.js.
-- **Dependencies:** `next`, `react`, `three` (lazy), `clsx`; dev-only `ffmpeg-static` for the media script. No UI kit, no icon pack.
+- **Dependencies:** `next`, `react`, `three` (lazy), `clsx`, `@vercel/analytics` (page views on the deploy, loaded after the page); dev-only `ffmpeg-static` for the media script. No UI kit, no icon pack.
 
 ### Folder structure
 ```

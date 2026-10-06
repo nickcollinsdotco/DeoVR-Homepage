@@ -27,7 +27,7 @@ Every VR video is a window to somewhere. The homepage is a **Viewfinder** made l
 - Data is a committed static snapshot of real DeoVR content (`src/data/*.json`, produced by `scripts/snapshot.mjs`). Never invent fake videos or lorem ipsum. Derived fields (e.g. comfort) must be labelled as estimates in the UI.
 - three.js is lazy-loaded and lives only in `src/lib/immersive/` and `src/components/immersive/`. Every WebGL surface must fall back to covers / flat previews.
 - Equirect stills and stage loops are self-hosted in `public/media/` (`scripts/media.mjs`). Covers and flat previews are hotlinked from `cdn-vr.deovr.com`; images use `next/image` with `unoptimized` + explicit sizes. Previews: `preload="none"`, mounted on intent, unmounted on leave.
-- Keep dependencies intentional. Ask before adding anything beyond `next`, `react`, `tailwindcss`, `clsx` (and the pre-approved optional `motion`, lazy `three`).
+- Keep dependencies intentional. Ask before adding anything beyond `next`, `react`, `tailwindcss`, `clsx`, `@vercel/analytics` (and the pre-approved optional `motion`, lazy `three`).
 - Accessibility is required: semantic landmarks, keyboard support, `<dialog>` with focus restore, `aria-live` feedback, AA contrast, `prefers-reduced-motion` disables autoplay.
 - Performance budgets: LCP < 2.0s, CLS < 0.02, homepage JS < 120KB gz.
 
