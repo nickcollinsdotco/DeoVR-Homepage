@@ -37,7 +37,7 @@ export function setPortalActive(key: string, active: boolean, auto = false) {
   if (!active) { p.nx = 0; p.ny = 0; }
 }
 
-export function setPortalPointer(key: string, nx: number, ny: number) {
+function setPortalPointer(key: string, nx: number, ny: number) {
   const p = portals.get(key);
   if (!p) return;
   p.nx = Math.max(-1, Math.min(1, nx));

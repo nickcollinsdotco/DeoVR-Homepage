@@ -1,0 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=Inter:wght@400;500;600&display=swap');
+
+:root {
+  --ground: oklch(0.165 0.006 60);
+  --s1: oklch(0.195 0.007 60);
+  --s2: oklch(0.235 0.008 60);
+  --s3: oklch(0.285 0.008 60);
+  --line: oklch(0.36 0.008 60 / 0.55);
+  --text: oklch(0.94 0.008 80);
+  --text-2: oklch(0.77 0.01 70);
+  --text-3: oklch(0.62 0.01 70);
+  --accent: oklch(0.7 0.19 358);
+  --accent-ink: oklch(0.18 0.03 358);
+  --still: oklch(0.8 0.1 170);
+  --moving: oklch(0.82 0.13 75);
+  --ease: cubic-bezier(.2, .7, .2, 1);
+  --display: 'Archivo', system-ui, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--ground); color: var(--text); font: 400 15px/1.45 Inter, system-ui, sans-serif; font-feature-settings: 'tnum' 0, 'cv11'; -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; padding: 0; }
+a { color: inherit; text-decoration: none; }
+img { display: block; }
+:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; border-radius: 6px; }
+
+/* top bar */
+.top { position: sticky; top: 0; z-index: 50; height: 64px; display: flex; align-items: center; gap: 28px; padding: 0 28px; background: var(--ground); border-bottom: 1px solid transparent; }
+.top.scrolled { border-bottom-color: var(--line); }
+.logo { display: flex; align-items: center; gap: 8px; font: 700 21px/1 Inter; letter-spacing: -0.02em; }
+.top nav { display: flex; gap: 22px; color: var(--text-2); font-weight: 500; font-size: 14px; }
+.top nav a[aria-current] { color: var(--text); }
+.search { flex: 1; max-width: 420px; margin-left: auto; height: 40px; display: flex; align-items: center; gap: 10px; padding: 0 16px; border-radius: 999px; background: var(--s1); color: var(--text-3); font-size: 14px; }
+.top .actions { display: flex; gap: 8px; align-items: center; }
+.pill { height: 40px; padding: 0 16px; border-radius: 999px; display: inline-flex; align-items: center; gap: 8px; font-weight: 500; font-size: 14px; background: var(--s1); color: var(--text); transition: background .15s var(--ease); white-space: nowrap; }
+.pill:hover { background: var(--s2); }
+.pill.primary { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+.pill.primary:hover { background: oklch(0.75 0.19 358); }
+.pill.ghost { background: transparent; }
+.pill .count { font-feature-settings: 'tnum'; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--s3); font-size: 12px; display: grid; place-items: center; }
+
+/* signature */
+.sig { display: inline-flex; align-items: center; gap: 10px; font: 500 12px/1 Inter; letter-spacing: .02em; color: var(--text-2); font-feature-settings: 'tnum'; white-space: nowrap; }
+.sig > span { display: inline-flex; align-items: center; gap: 5px; }
+.sig > span + span::before { content: ''; width: 3px; height: 3px; border-radius: 50%; background: var(--text-3); opacity: .6; margin-right: 5px; }
+.sig .fps { font-size: 0.8em; color: var(--text-3); margin-left: 2px; align-self: flex-start; margin-top: -1px; }
+.sig .fov { color: var(--text); }
+.comfort .dots { display: inline-flex; gap: 2px; }
+.comfort .dots i { width: 4px; height: 8px; border-radius: 1px; background: var(--s3); }
+.comfort[data-level=still] .dots i.on { background: var(--still); }
+.comfort[data-level=gentle] .dots i.on { background: var(--text-2); }
+.comfort[data-level=moving] .dots i.on { background: var(--moving); }
+
+/* chips */
+.chips { display: flex; gap: 6px; }
+.chip { height: 36px; padding: 0 14px; border-radius: 999px; font-weight: 500; font-size: 14px; color: var(--text-2); display: inline-flex; align-items: center; gap: 6px; transition: background .15s var(--ease), color .15s var(--ease); white-space: nowrap; }
+.chip:hover { background: var(--s1); color: var(--text); }
+.chip[aria-pressed=true] { background: var(--text); color: var(--ground); }
+.seg { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--s1); }
+.seg .chip { height: 30px; }
+
+.spike-tag:hover { color: var(--text); }
+.spike-tag { position: fixed; left: 16px; bottom: 16px; z-index: 100; font: 500 11px/1 Inter; letter-spacing: .06em; text-transform: uppercase; color: var(--text-3); background: var(--s1); padding: 8px 10px; border-radius: 6px; }

@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>D · Portals · DeoVR directions</title>
+<link rel="stylesheet" href="assets/spatial.css">
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js" } }</script>
+<script src="assets/data.js"></script>
+<style>
+  #gridCanvas { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
+  main, .discovery { position: relative; z-index: 1; }
+
+  /* ---- stage ---- */
+  .stage { position: relative; z-index: 2; margin: 8px 28px 0; height: min(76vh, 760px); min-height: 520px; display: grid; }
+  .stage-view { position: absolute; inset: 0; border-radius: 8px; overflow: hidden; background: var(--s1); cursor: grab; touch-action: none; }
+  .stage-view:active { cursor: grabbing; }
+  .stage-view canvas { width: 100%; height: 100%; display: block; }
+  .stage-view.fly { position: fixed; z-index: 80; transition: top .6s var(--ease), left .6s var(--ease), width .6s var(--ease), height .6s var(--ease), border-radius .6s var(--ease); }
+  .stage-scrim { position: absolute; inset: 0; pointer-events: none; border-radius: 8px;
+    background: linear-gradient(to top, oklch(0.165 0.006 60 / .92) 0%, oklch(0.165 0.006 60 / .55) 30%, transparent 58%),
+                linear-gradient(to right, oklch(0.165 0.006 60 / .5), transparent 45%); }
+  .stage-meta { position: relative; align-self: end; padding: 0 40px 36px; max-width: 760px; pointer-events: none; }
+  .stage-meta > * { pointer-events: auto; }
+  .eyebrow { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 500; color: var(--text-2); margin-bottom: 14px; }
+  .eyebrow img { width: 24px; height: 24px; border-radius: 50%; }
+  .stage h1 { font: 800 clamp(44px, 5.6vw, 84px)/.92 var(--display); font-variation-settings: 'wdth' 72; letter-spacing: -0.015em; margin: 0 0 18px; text-wrap: balance; }
+  .stage .sig { font-size: 14px; gap: 12px; color: var(--text); }
+  .stage .sig .fov { width: 18px; height: 18px; }
+  .stage-actions { display: flex; gap: 10px; margin-top: 24px; }
+  .stage-actions .pill { height: 48px; padding: 0 22px; font-size: 15px; }
+  .stage-actions .pill:not(.primary) { background: oklch(0.94 0.008 80 / .1); }
+  .stage-actions .pill:not(.primary):hover { background: oklch(0.94 0.008 80 / .18); }
+
+  .dial { position: absolute; right: 32px; top: 28px; display: flex; align-items: center; gap: 12px; color: var(--text-2); font-size: 13px; font-weight: 500; pointer-events: none; }
+  .dial svg { width: 44px; height: 44px; color: var(--text); }
+  .dial .wedge { transform-box: view-box; transition: none; }
+
+  .alts { position: absolute; right: 28px; bottom: 28px; display: flex; gap: 10px; }
+  .alt { width: 132px; text-align: left; opacity: .72; transition: opacity .2s var(--ease); }
+  .alt:hover, .alt[aria-pressed=true] { opacity: 1; }
+  .alt img { width: 132px; aspect-ratio: 5/3; object-fit: cover; border-radius: 6px; outline: 2px solid transparent; outline-offset: 2px; transition: outline-color .2s; }
+  .alt[aria-pressed=true] img { outline-color: var(--text); }
+  .alt span { display: block; margin-top: 8px; font-size: 12px; font-weight: 500; color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .inside-ui { position: fixed; z-index: 90; inset: auto 0 32px 0; display: none; justify-content: center; gap: 10px; }
+  body.inside .inside-ui { display: flex; }
+  body.inside .stage-meta, body.inside .alts, body.inside .stage-scrim { opacity: 0; pointer-events: none; }
+  body.inside .dial { position: fixed; z-index: 90; }
+  body.inside .stage { z-index: 100; }
+  body.inside .inside-ui { z-index: 110; }
+
+  /* ---- discovery ---- */
+  .discovery { position: sticky; top: 64px; z-index: 40; display: flex; align-items: center; gap: 20px; padding: 14px 28px; margin-top: 28px; background: var(--ground); }
+  .discovery .sep { width: 1px; height: 24px; background: var(--line); }
+  .discovery .right { margin-left: auto; display: flex; gap: 12px; align-items: center; color: var(--text-3); font-size: 13px; }
+
+  /* ---- grid ---- */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 40px 20px; padding: 16px 28px 120px; }
+  .card { min-width: 0; }
+  .media { position: relative; display: block; width: 100%; aspect-ratio: 5/3; border-radius: 8px; transition: transform .25s var(--ease); }
+  .media img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; transition: opacity .3s var(--ease); background: var(--s1); }
+  .card.portal .media img { opacity: 0; }
+  .card:hover .media, .card:focus-within .media { transform: scale(1.025); }
+  .dur { position: absolute; right: 8px; bottom: 8px; font: 500 12px/1 Inter; font-feature-settings: 'tnum'; padding: 4px 6px; border-radius: 4px; background: oklch(0.165 0.006 60 / .82); }
+  .hint { position: absolute; left: 10px; bottom: 8px; font: 500 12px/1 Inter; padding: 5px 8px; border-radius: 4px; background: oklch(0.165 0.006 60 / .82); color: var(--text-2); opacity: 0; transition: opacity .3s var(--ease) .2s; }
+  .card.portal.active .hint { opacity: 1; }
+  .card .sig { margin-top: 14px; }
+  .card h3 { margin: 8px 0 6px; font: 600 16px/1.3 Inter; letter-spacing: -0.005em; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .by { display: flex; align-items: center; gap: 8px; color: var(--text-3); font-size: 13px; }
+  .by img { width: 20px; height: 20px; border-radius: 50%; }
+  .by b { color: var(--text-2); font-weight: 500; }
+  .card .fov .wedge { transform-box: view-box; transform-origin: 8px 8px; opacity: 0; transition: opacity .2s; }
+  .card .sig-fov svg:not(:has(circle + circle)) .wedge { transform-origin: 8px 10px; }
+  .card.active .fov .wedge { opacity: .55; }
+</style>
+</head>
+<body>
+<canvas id="gridCanvas"></canvas>
+<header class="top" id="top">
+  <a class="logo" href="#"><svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3f7bff"/><stop offset=".55" stop-color="#ff4f93"/><stop offset="1" stop-color="#ff9a3d"/></linearGradient></defs><path d="M6 3.5c0-1.3 1.4-2 2.5-1.4l14 9.1c1 .7 1 2.1 0 2.8l-14 9.1C7.4 23.8 6 23 6 21.7z" fill="url(#lg)"/></svg>DeoVR</a>
+  <nav><a aria-current="page" href="#">Videos</a><a href="#">Photos</a><a href="#">Channels</a><a href="#">Passthrough</a><a href="#">Premium</a></nav>
+  <div class="search">Search places, creators, moments<span style="margin-left:auto;font-size:12px;opacity:.7">/</span></div>
+  <div class="actions"><button class="pill ghost">Headset view</button><button class="pill">Headset queue <span class="count">0</span></button><button class="pill ghost">Sign in</button></div>
+</header>
+
+<section class="stage" aria-label="Featured">
+  <div class="stage-view" id="stageView"><canvas id="stageCanvas"></canvas><div class="stage-scrim"></div></div>
+  <div class="dial" id="dial"></div>
+  <div class="stage-meta" id="stageMeta"></div>
+  <div class="alts" id="alts" role="group" aria-label="Featured alternates"></div>
+</section>
+<div class="inside-ui"><button class="pill" id="stepBack">Step back  <span style="opacity:.6">Esc</span></button><button class="pill primary">Watch in VR</button></div>
+
+<nav class="discovery" aria-label="Discover">
+  <div class="seg chips"><button class="chip" aria-pressed="true">For you</button><button class="chip">New</button><button class="chip">Trending</button></div>
+  <span class="sep"></span>
+  <div class="chips" id="intents"></div>
+  <div class="right">Cards<div class="seg chips"><button class="chip" aria-pressed="true" data-mode="window">Window</button><button class="chip" data-mode="planet">Planet</button></div></div>
+</nav>
+<main class="grid" id="grid"></main>
+<a class="spike-tag" href="./">← Directions · D · Portals</a>
+
+<script type="module">
+import * as THREE from 'three';
+import { videos, byId, signature, fovGlyph, cleanTitle, dur, count, ago, makeRenderer, eqTexture, videoTexture, isReady, damp, reduced } from './assets/spatial.js';
+
+/* ---------------- stage ---------------- */
+const stageIds = ['123847', '96490', '137356', videos.find((v) => v.fov === 180 && v.eq && v.depth === '3D' && /travel|city/.test(v.intents)).id];
+const S = makeRenderer(document.getElementById('stageCanvas'), { alpha: false });
+const stageView = document.getElementById('stageView');
+let stage = { v: null, tex: null, video: null, yaw: 0, pitch: 0, vyaw: 0, tyaw: 0, tpitch: 0, vfov: 1.15, tvfov: 1.15, drag: null, idle: 0, fade: 0 };
+
+function setStage(id) {
+  const v = byId[id];
+  stage.v = v; stage.fade = 0; stage.yaw = stage.tyaw = 0; stage.pitch = stage.tpitch = 0;
+  if (stage.video) { stage.video.pause(); stage.video.remove(); stage.video = null; }
+  if (v.loop && !reduced) {
+    const el = Object.assign(document.createElement('video'), { src: v.loop, muted: true, loop: true, playsInline: true, crossOrigin: 'anonymous', preload: 'auto' });
+    el.play().catch(() => {});
+    stage.video = el; stage.tex = videoTexture(el);
+  } else stage.tex = eqTexture(v);
+  S.u.uMapA.value = stage.tex; S.u.uHalfA.value = v.fov >= 360 ? 0 : 1;
+  const ch = v.ch;
+  document.getElementById('stageMeta').innerHTML = `
+    <div class="eyebrow"><img src="${ch?.avatar}" alt="">${ch?.name ?? v.channel} · Featured</div>
+    <h1>${cleanTitle(v.title)}</h1>
+    ${signature(v)}
+    <div class="stage-actions"><button class="pill primary" id="stepIn">Step inside</button><button class="pill">Add to headset queue</button><button class="pill ghost">Details</button></div>`;
+  document.getElementById('stepIn').onclick = () => stepInside();
+  document.getElementById('dial').innerHTML = `${fovGlyph(v.fov, 44)}<span>Drag to look around</span>`;
+  document.querySelectorAll('.alt').forEach((b) => b.setAttribute('aria-pressed', b.dataset.id === id));
+}
+document.getElementById('alts').innerHTML = stageIds.map((id) => { const v = byId[id]; return `<button class="alt" data-id="${id}"><img src="${v.cover.sm}" alt=""><span>${cleanTitle(v.title)}</span></button>`; }).join('');
+document.getElementById('alts').onclick = (e) => { const b = e.target.closest('.alt'); if (b) setStage(b.dataset.id); };
+setStage(stageIds[0]);
+
+stageView.addEventListener('pointerdown', (e) => { stage.drag = { x: e.clientX, y: e.clientY }; stageView.setPointerCapture(e.pointerId); });
+stageView.addEventListener('pointermove', (e) => {
+  if (!stage.drag) return;
+  const k = stage.vfov / stageView.clientHeight;
+  stage.tyaw -= (e.clientX - stage.drag.x) * k; stage.tpitch += (e.clientY - stage.drag.y) * k;
+  stage.vyaw = -(e.clientX - stage.drag.x) * k * 60;
+  stage.drag = { x: e.clientX, y: e.clientY }; stage.idle = 0;
+});
+stageView.addEventListener('pointerup', () => { stage.drag = null; });
+
+/* step inside: FLIP the stage view to full viewport */
+let flyFrom = null;
+function stepInside() {
+  const r = stageView.getBoundingClientRect(); flyFrom = r;
+  Object.assign(stageView.style, { top: r.top + 'px', left: r.left + 'px', width: r.width + 'px', height: r.height + 'px' });
+  stageView.classList.add('fly'); document.body.classList.add('inside'); document.body.style.overflow = 'hidden';
+  requestAnimationFrame(() => requestAnimationFrame(() => Object.assign(stageView.style, { top: '0px', left: '0px', width: '100vw', height: '100vh', borderRadius: '0' })));
+  stage.tvfov = 1.55;
+}
+function stepBack() {
+  if (!flyFrom) return;
+  const r = document.querySelector('.stage').getBoundingClientRect();
+  Object.assign(stageView.style, { top: r.top + 'px', left: r.left + 'px', width: r.width + 'px', height: r.height + 'px', borderRadius: '8px' });
+  stage.tvfov = 1.15; document.body.classList.remove('inside'); document.body.style.overflow = '';
+  setTimeout(() => { stageView.classList.remove('fly'); stageView.removeAttribute('style'); }, 620);
+  flyFrom = null;
+}
+document.getElementById('stepBack').onclick = stepBack;
+addEventListener('keydown', (e) => { if (e.key === 'Escape') stepBack(); });
+
+/* ---------------- grid ---------------- */
+const INTENTS = [['all', 'All'], ['travel', 'Travel'], ['city', 'City walks'], ['nature', 'Nature & calm'], ['music', 'Music & events'], ['adrenaline', 'Adrenaline'], ['stories', 'Stories']];
+let intent = 'all', mode = 'window';
+document.getElementById('intents').innerHTML = INTENTS.map(([k, l]) => `<button class="chip" data-k="${k}" aria-pressed="${k === intent}">${l}</button>`).join('');
+document.getElementById('intents').onclick = (e) => { const b = e.target.closest('.chip'); if (!b) return; intent = b.dataset.k; document.querySelectorAll('#intents .chip').forEach((c) => c.setAttribute('aria-pressed', c === b)); renderGrid(); };
+document.querySelector('.right').onclick = (e) => { const b = e.target.closest('[data-mode]'); if (!b) return; mode = b.dataset.mode; document.querySelectorAll('[data-mode]').forEach((c) => c.setAttribute('aria-pressed', c === b)); cards.forEach((c) => c.el.classList.toggle('portal', mode === 'planet' && !!c.tex)); };
+
+const feed = videos.filter((v) => !stageIds.includes(v.id)).toSorted((a, b) => (!!b.eq - !!a.eq) || (a.feeds.home ?? 99) - (b.feeds.home ?? 99) || b.views - a.views);
+let cards = [];
+function renderGrid() {
+  const list = feed.filter((v) => intent === 'all' || v.intents.includes(intent)).slice(0, 24);
+  const grid = document.getElementById('grid');
+  grid.innerHTML = list.map((v) => `
+    <article class="card" data-id="${v.id}">
+      <button class="media" aria-label="Quick view: ${cleanTitle(v.title)}"><img src="${v.cover.sm}" alt="" loading="lazy"><span class="dur">${dur(v.durationSec)}</span>${v.eq ? `<span class="hint">Move to look around</span>` : ''}</button>
+      ${signature(v, { length: false })}
+      <h3>${v.title}</h3>
+      <p class="by"><img src="${v.ch?.avatar}" alt=""><b>${v.ch?.name ?? v.channel}</b> · ${count(v.views)} views · ${ago(v.publishedAt)}</p>
+    </article>`).join('');
+  cards = [...grid.querySelectorAll('.card')].map((el) => {
+    const v = byId[el.dataset.id];
+    const c = { el, v, media: el.querySelector('.media'), wedge: el.querySelector('.wedge'), tex: v.eq ? eqTexture(v) : null, fade: 0, morph: 1, yaw: 0, pitch: 0, tyaw: 0, tpitch: 0, active: false };
+    el.classList.toggle('portal', mode === 'planet' && !!c.tex);
+    const enter = () => { if (!c.tex) return; c.active = true; c.tyaw = 0; el.classList.add('active', 'portal'); };
+    const leave = () => { c.active = false; el.classList.remove('active'); if (mode === 'window') el.classList.remove('portal'); c.tyaw = 0; c.tpitch = 0; };
+    c.media.addEventListener('pointerenter', enter); c.media.addEventListener('pointerleave', leave);
+    c.media.addEventListener('focus', enter); c.media.addEventListener('blur', leave);
+    c.media.addEventListener('pointermove', (e) => {
+      const r = c.media.getBoundingClientRect(), nx = ((e.clientX - r.left) / r.width) * 2 - 1, ny = ((e.clientY - r.top) / r.height) * 2 - 1;
+      const range = v.fov >= 360 ? Math.PI : Math.PI / 2 - 0.6;
+      c.tyaw = nx * range; c.tpitch = -ny * 0.4;
+    });
+    c.media.addEventListener('click', () => { setStage(v.id); scrollTo({ top: 0, behavior: 'smooth' }); setTimeout(stepInside, 450); });
+    return c;
+  });
+}
+renderGrid();
+
+const G = makeRenderer(document.getElementById('gridCanvas'));
+const S1 = new THREE.Vector3(0.105, 0.098, 0.092), GROUND = new THREE.Vector3(0.082, 0.075, 0.07);
+
+/* ---------------- loop ---------------- */
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min((now - last) / 1000, 0.05); last = now;
+  // stage
+  const sv = stageView, w = sv.clientWidth, h = sv.clientHeight;
+  if (S.renderer.domElement.width !== Math.round(w * S.renderer.getPixelRatio())) S.renderer.setSize(w, h, false);
+  if (!stage.drag) { stage.tyaw += stage.vyaw * dt; stage.vyaw = damp(stage.vyaw, 0, 3, dt); stage.idle += dt; if (stage.idle > 2 && !reduced && stage.v.fov >= 360) stage.tyaw += dt * 0.025; }
+  if (stage.v.fov < 360) stage.tyaw = Math.max(-(Math.PI / 2 - 0.5), Math.min(Math.PI / 2 - 0.5, stage.tyaw));
+  stage.tpitch = Math.max(-0.9, Math.min(0.9, stage.tpitch));
+  stage.yaw = damp(stage.yaw, stage.tyaw, 10, dt); stage.pitch = damp(stage.pitch, stage.tpitch, 10, dt); stage.vfov = damp(stage.vfov, stage.tvfov, 5, dt);
+  if (isReady(stage.tex)) stage.fade = damp(stage.fade, 1, 4, dt);
+  Object.assign(S.u, {}); S.u.uYaw.value = stage.yaw; S.u.uPitch.value = stage.pitch; S.u.uVfov.value = stage.vfov; S.u.uAspect.value = w / h;
+  S.u.uFade.value = stage.fade; S.u.uMorph.value = 0; S.u.uRadius.value = 0; S.u.uVignette.value = 0.35; S.u.uSize.value.set(w, h);
+  S.renderer.setViewport(0, 0, w, h); S.renderer.clear(); S.renderer.render(S.scene, S.camera);
+  const dialWedge = document.querySelector('#dial .wedge');
+  if (dialWedge) { const deg = (stage.yaw * 180) / Math.PI; dialWedge.style.transformOrigin = stage.v.fov >= 360 ? '22px 22px' : '22px 24px'; dialWedge.style.transform = `rotate(${stage.v.fov >= 360 ? deg : Math.max(-90, Math.min(90, deg))}deg)`; }
+
+  // grid portals, one shared canvas behind the DOM
+  const R = G.renderer, W = innerWidth, H = innerHeight;
+  if (R.domElement.width !== Math.round(W * R.getPixelRatio())) R.setSize(W, H, false);
+  R.setScissorTest(false); R.setClearColor(0x000000, 0); R.clear(); R.setScissorTest(true);
+  const topEdge = 64 + document.querySelector('.discovery').offsetHeight;
+  for (const c of cards) {
+    if (!c.tex) continue;
+    const planet = mode === 'planet';
+    c.fade = damp(c.fade, c.active && isReady(c.tex) ? 1 : 0, 9, dt);
+    c.morph = damp(c.morph, planet && !c.active ? 1 : 0, 6, dt);
+    c.yaw = damp(c.yaw, c.tyaw, 6, dt); c.pitch = damp(c.pitch, c.tpitch, 6, dt);
+    if (c.wedge) c.wedge.style.transform = `rotate(${Math.max(c.v.fov >= 360 ? -180 : -90, Math.min(c.v.fov >= 360 ? 180 : 90, (c.yaw * 180) / Math.PI))}deg)`;
+    if (c.fade < 0.01 && !(planet && isReady(c.tex))) continue;
+    const r = c.media.getBoundingClientRect();
+    if (r.bottom < topEdge || r.top > H) continue;
+    const top = Math.max(r.top, topEdge);
+    R.setViewport(r.left, H - r.bottom, r.width, r.height); R.setScissor(r.left, H - r.bottom, r.width, r.bottom - top);
+    const u = G.u;
+    u.uMapA.value = c.tex; u.uHalfA.value = c.v.fov >= 360 ? 0 : 1; u.uYaw.value = c.yaw; u.uPitch.value = c.pitch; u.uVfov.value = 1.25;
+    u.uAspect.value = r.width / r.height; u.uMorph.value = planet ? c.morph : 0; u.uFade.value = planet ? 1 : c.fade;
+    u.uPlanet.value = c.v.fov >= 360 ? 1.85 : 1.2; u.uOffset.value.set(0, c.v.fov >= 360 ? 0 : 0.72); u.uCut.value = c.v.fov >= 360 ? 0.45 : 0.5;
+    u.uBg.value = planet ? S1 : GROUND; u.uRadius.value = 8 * R.getPixelRatio(); u.uSize.value.set(r.width * R.getPixelRatio(), r.height * R.getPixelRatio()); u.uVignette.value = 0;
+    R.render(G.scene, G.camera);
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+addEventListener('scroll', () => document.getElementById('top').classList.toggle('scrolled', scrollY > 8), { passive: true });
+</script>
+</body>
+</html>

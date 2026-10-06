@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { Texture } from "three";
-import { Icon } from "@/components/Icons";
+import { Icon } from "@/components/ui/Icons";
 
 type Source = { key: string; full: boolean; still?: string; loop?: string };
 

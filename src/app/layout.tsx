@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Archivo, Inter } from "next/font/google";
 import "./globals.css";
-import { AppProviders } from "@/components/AppProviders";
+import { AppProviders } from "@/components/providers/AppProviders";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -17,7 +17,7 @@ const archivo = Archivo({
 });
 
 export const metadata: Metadata = {
-  title: "DeoVR — Find your next window",
+  title: "DeoVR · Find your next window",
   description:
     "Discover immersive VR video by where you want to go, how you want to feel, and what you want to see.",
   applicationName: "DeoVR",

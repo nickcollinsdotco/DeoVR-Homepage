@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<base href="/directions/">
+<title>Directions explored · DeoVR homepage</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/directions.css">
+<style>
+  main { max-width: 68rem; margin: 0 auto; padding: 5rem var(--gutter) 6rem; }
+  h1 { font-family: var(--font-display); font-stretch: 78%; font-weight: 750; font-size: clamp(2.5rem, 6vw, 3.75rem); line-height: .95; margin: 0 0 1rem; }
+  h2.round { margin: 3.5rem 0 .5rem; font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; color: var(--text-3); font-weight: 600; }
+  p.lead { color: var(--text-2); max-width: 58ch; margin: 0; }
+  .d { display: grid; grid-template-columns: 3rem 1fr auto; gap: 1.5rem; align-items: start; padding: 1.75rem 0; border-top: 1px solid var(--line); }
+  .d b { font-family: var(--font-display); font-stretch: 78%; font-size: 2.5rem; line-height: 1; color: var(--text-3); }
+  .d h3 { margin: 0 0 .35rem; font-size: 1.25rem; }
+  .d p { margin: 0; color: var(--text-2); max-width: 58ch; }
+  .d p + p { margin-top: .5rem; color: var(--text-3); font-size: .9rem; }
+  .verdict { display: inline-block; margin-left: .5rem; font-size: .75rem; font-weight: 600; vertical-align: middle; color: var(--text-3); }
+  .verdict.kept { color: var(--accent); }
+  .links { display: flex; gap: .5rem; flex-wrap: wrap; justify-content: end; }
+  .note { margin-top: 3rem; color: var(--text-3); font-size: .875rem; }
+  .ship { margin-top: 3.5rem; padding: 1.5rem; border-radius: 8px; background: var(--surface-1); display: flex; gap: 1.5rem; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+  .ship p { margin: 0; color: var(--text-2); max-width: 52ch; }
+  @media (max-width: 720px) { .d { grid-template-columns: 2.25rem 1fr; } .links { grid-column: 2; justify-content: start; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Directions explored</h1>
+  <p class="lead">Before building, each direction was prototyped in code against a real snapshot of the DeoVR catalogue. They are throwaway explorations with limited functionality, kept so the decisions behind the final homepage can be seen and tried. Reasoning: <code>docs/design-direction.md</code>.</p>
+
+  <h2 class="round">Round 1 · Structure</h2>
+  <section class="d"><b>A</b><div><h3>Marquee <span class="verdict">Not pursued</span></h3><p>Cinematic streaming service: rotating full-bleed hero and themed horizontal rails.</p><p>Looks premium instantly, but hides the catalogue's breadth and does nothing for the VR-specific decision. Reads as a Netflix clone.</p></div>
+    <div class="links"><a class="btn btn-secondary" href="a-marquee.html">Desktop</a><a class="btn btn-ghost" href="a-marquee.html?view=headset">Headset</a></div></section>
+  <section class="d"><b>B</b><div><h3>Viewfinder <span class="verdict kept">Stage kept</span></h3><p>Focus-driven 10-foot UI: a stage plays whatever has focus, with shelves and a filmstrip below. Arrow keys or thumbstick.</p><p>Excellent in a headset, too slow to scan on desktop. Its featured stage and focusable alternates became the top of the final page.</p></div>
+    <div class="links"><a class="btn btn-secondary" href="b-viewfinder.html">Desktop</a><a class="btn btn-ghost" href="b-viewfinder.html?view=headset">Headset</a></div></section>
+  <section class="d"><b>C</b><div><h3>Field Guide <span class="verdict kept">Grid kept</span></h3><p>The grid, made VR-aware: every card carries the Immersion Signature, and discovery separates <em>where</em> from <em>how it feels</em>.</p><p>The most useful, but it felt safe. Its grid, signature, filters and quick view became the discovery layer under B's stage.</p></div>
+    <div class="links"><a class="btn btn-secondary" href="c-field-guide.html">Desktop</a><a class="btn btn-ghost" href="c-field-guide.html?view=headset">Headset</a></div></section>
+
+  <h2 class="round">Round 2 · Spatial (WebGL)</h2>
+  <section class="d"><b>D</b><div><h3>Portals <span class="verdict kept">Shipped</span></h3><p>Every card is a window: hover and move to look around inside the real 360° or 180° scene. A Planet toggle draws each video as its shape: spheres for 360°, domes for 180°.</p><p>Answers "what's it like there?" without leaving the grid. Became the portal cards, the "Where in the world" planets and Step inside.</p></div>
+    <div class="links"><a class="btn btn-secondary" href="d-portals.html">Open</a></div></section>
+  <section class="d"><b>E</b><div><h3>Inside-out <span class="verdict kept">Moment kept</span></h3><p>You stand inside the featured world, with a curved shelf in front of you. Pointing at a tile cross-dissolves the whole world to that place.</p><p>The biggest first impression, but a single shelf can't show a large catalogue. Its world crossfade now drives the stage alternates.</p></div>
+    <div class="links"><a class="btn btn-secondary" href="e-inside-out.html">Open</a></div></section>
+
+  <div class="ship"><p><strong>The result:</strong> B's stage as a real look-around world, C's grid with D's portals, E's crossfade, and WebXR "Enter VR" on headsets.</p><a class="btn btn-primary" href="/">Open the homepage</a></div>
+
+  <p class="note">Media and catalogue data © DeoVR and its creators, used for a non-commercial design prototype. Data from <code>scripts/snapshot.mjs</code>; equirect stills and loops from <code>scripts/media.mjs</code>.</p>
+</main>
+</body>
+</html>

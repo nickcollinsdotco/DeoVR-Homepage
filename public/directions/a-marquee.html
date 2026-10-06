@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A · Marquee — DeoVR exploration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/directions.css">
+<style>
+  .top { position: fixed; inset: 0 0 auto; z-index: 50; display: flex; align-items: center; gap: 2rem; padding: 1rem var(--gutter); transition: background var(--d2) var(--ease);
+    background: linear-gradient(180deg, oklch(0.155 0.006 60 / .7), transparent); }
+  .top.solid { background: var(--bg); }
+  .nav { display: flex; gap: 1.25rem; font-size: .9375rem; font-weight: 500; color: var(--text-2); }
+  .nav a[aria-current] { color: var(--text); }
+  .sp { flex: 1; }
+
+  .hero { position: relative; height: min(88vh, 56rem); min-height: 34rem; overflow: hidden; }
+  .hero .media { position: absolute; inset: 0; aspect-ratio: auto; border-radius: 0; }
+  .hero .media > img { transition: opacity 700ms var(--ease), transform 8s linear; }
+  .hero .media.swap > img { opacity: 0; }
+  .hero .media.live > img { transform: scale(1.06); }
+  .hero::after { content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(90deg, oklch(0.155 0.006 60 / .85) 0%, oklch(0.155 0.006 60 / .3) 45%, transparent 70%), linear-gradient(0deg, var(--bg) 0%, transparent 35%); }
+  .hero-info { position: absolute; z-index: 2; left: var(--gutter); bottom: 22%; width: min(42rem, 55%); display: grid; gap: 1.25rem; }
+  .hero-info > * { transition: opacity 400ms var(--ease), transform 400ms var(--ease); }
+  .hero-info.swap > * { opacity: 0; transform: translateY(6px); }
+  .kicker { font-size: .8rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--text-2); }
+  .hero h1 { margin: 0; font-family: var(--font-display); font-weight: 800; font-stretch: 72%; font-size: clamp(3.5rem, 7.5vw, 8rem); line-height: .86; letter-spacing: -0.02em; text-transform: uppercase; text-wrap: balance; }
+  .hero p { margin: 0; font-size: 1.125rem; color: var(--text-2); max-width: 38ch; }
+  .actions { display: flex; gap: .6rem; }
+  .actions .btn { min-height: 3rem; padding: 0 1.5rem; font-size: 1rem; }
+  .pager { position: absolute; z-index: 2; right: var(--gutter); bottom: 22%; display: flex; gap: .4rem; }
+  .pager button { width: 2.25rem; height: 1.5rem; display: grid; align-items: center; }
+  .pager button::before { content: ''; height: 3px; border-radius: 2px; background: oklch(1 0 0 / .3); }
+  .pager button[aria-current="true"]::before { background: var(--text); }
+
+  .rails { position: relative; z-index: 3; margin-top: -9rem; padding-bottom: 5rem; display: grid; gap: 2.75rem; }
+  .rail h2 { margin: 0 0 .9rem; padding: 0 var(--gutter); font-size: 1.25rem; font-weight: 600; letter-spacing: -0.01em; }
+  .rail-wrap { position: relative; }
+  .row { display: flex; gap: .6rem; overflow-x: auto; padding: 0 var(--gutter); scroll-padding: 0 var(--gutter); scroll-snap-type: x mandatory; scrollbar-width: none; }
+  .tile { position: relative; flex: 0 0 calc((100% - 2 * var(--gutter) - 4 * .6rem) / 5); scroll-snap-align: start; text-align: left; }
+  .tile .media { border-radius: 6px; }
+  .tile .media img { transition: transform var(--d3) var(--ease); }
+  .tile:hover .media img { transform: scale(1.04); }
+  .tile .ov { position: absolute; inset: auto 0 0; z-index: 2; padding: 2.5rem .8rem .7rem; border-radius: 0 0 6px 6px; background: linear-gradient(0deg, oklch(0.12 0.005 60 / .95), transparent); opacity: 0; transition: opacity var(--d2) var(--ease); }
+  .tile:hover .ov, .tile:focus-visible .ov { opacity: 1; }
+  .ov b { display: block; font-size: .875rem; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ov span { font-size: .75rem; color: var(--text-2); }
+  .arrow { position: absolute; z-index: 4; top: 0; bottom: 0; width: var(--gutter); display: grid; place-items: center; background: oklch(0.155 0.006 60 / .6); opacity: 0; transition: opacity var(--d2); }
+  .arrow svg { width: 1.5rem; }
+  .arrow.r { right: 0; } .arrow.l { left: 0; transform: scaleX(-1); }
+  .rail-wrap:hover .arrow { opacity: 1; }
+
+  html[data-view="headset"] .tile { flex-basis: calc((100% - 2 * var(--gutter) - 2 * .6rem) / 3); }
+  html[data-view="headset"] .arrow { opacity: 1; width: 3.2rem; }
+  html[data-view="headset"] .tile .ov { opacity: 1; }
+
+  @media (max-width: 900px) {
+    .nav { display: none; }
+    .tile { flex-basis: 42%; }
+    .hero-info { width: auto; right: var(--gutter); }
+    .rails { margin-top: -4rem; }
+  }
+</style>
+</head>
+<body>
+<header class="top" id="top">
+  <a href="#" aria-label="DeoVR home" id="logo"></a>
+  <nav class="nav" aria-label="Primary"><a href="#" aria-current="page">Home</a><a href="#">Videos</a><a href="#">Photos</a><a href="#">Channels</a><a href="#">Premium</a></nav>
+  <span class="sp"></span>
+  <button class="icon-btn" aria-label="Search" id="a-search"></button>
+  <button class="btn btn-secondary">Sign in</button>
+</header>
+<main>
+  <section class="hero" aria-roledescription="carousel" aria-label="Featured">
+    <div class="media" id="hero-media"></div>
+    <div class="hero-info" id="hero-info" aria-live="polite"></div>
+    <div class="pager" id="pager"></div>
+  </section>
+  <div class="rails" id="rails"></div>
+</main>
+<script src="assets/data.js"></script>
+<script src="assets/directions.js"></script>
+<script>
+const { videos, featured, channels, icon, logo, esc, dur, cleanTitle, EDIT } = X;
+document.getElementById('logo').innerHTML = logo;
+document.getElementById('a-search').innerHTML = icon.search;
+addEventListener('scroll', () => document.getElementById('top').classList.toggle('solid', scrollY > 80), { passive: true });
+
+let h = 0, timer;
+function hero(n) {
+  h = (n + featured.length) % featured.length;
+  const v = featured[h], c = channels.get(v.channel) || {};
+  const m = document.getElementById('hero-media'), info = document.getElementById('hero-info');
+  m.classList.add('swap'); info.classList.add('swap');
+  setTimeout(() => {
+    m.classList.remove('live');
+    m.innerHTML = `<img src="${v.cover.lg}" alt="">`;
+    info.innerHTML = `<div class="kicker">${esc(v.place)}</div><h1>${esc(v.headline)}</h1><p>${esc(v.hook)}</p>
+      <div class="actions"><button class="btn btn-primary">${icon.play}Watch in VR</button><button class="btn btn-secondary" data-open="${v.slug}">${icon.info}More info</button></div>`;
+    requestAnimationFrame(() => { m.classList.remove('swap'); info.classList.remove('swap'); requestAnimationFrame(() => m.classList.add('live')); });
+  }, 350);
+  document.getElementById('pager').innerHTML = featured.map((_, j) => `<button aria-label="Slide ${j + 1}" aria-current="${j === h}" data-h="${j}"></button>`).join('');
+  clearTimeout(timer); timer = setTimeout(() => hero(h + 1), 8000);
+}
+hero(0);
+
+const by = (fn) => [...videos].sort(fn);
+const RAILS = [
+  ['Top picks', videos.filter((v) => v.feeds['top-picks'] !== undefined)],
+  ['Trending this month', by((a, b) => (a.feeds.trending ?? 999) - (b.feeds.trending ?? 999))],
+  ['Travel the world', videos.filter((v) => v.intents.includes('travel'))],
+  ['Music & live events', videos.filter((v) => v.intents.includes('music'))],
+  ['Nature', videos.filter((v) => v.intents.includes('nature'))],
+  ['Stories & animation', videos.filter((v) => v.intents.includes('stories'))],
+  ['New this week', by((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt))],
+];
+document.getElementById('rails').innerHTML = RAILS.map(([name, list]) => `
+  <section class="rail"><h2>${name}</h2><div class="rail-wrap">
+    <button class="arrow l" aria-label="Previous" data-dir="-1">${icon.chevron}</button>
+    <div class="row">${list.slice(0, 18).map((v) => `
+      <button class="tile" data-open="${v.slug}" aria-label="${esc(cleanTitle(v.title))}">
+        <div class="media"><img src="${v.cover.sm || v.cover.lg}" alt="" loading="lazy"></div>
+        <div class="ov"><b>${esc(EDIT[v.slug]?.headline || cleanTitle(v.title))}</b><span>${esc(channels.get(v.channel)?.name || '')} · ${dur(v.durationSec)}</span></div>
+      </button>`).join('')}</div>
+    <button class="arrow r" aria-label="Next" data-dir="1">${icon.chevron}</button>
+  </div></section>`).join('');
+
+document.addEventListener('click', (e) => {
+  const o = e.target.closest('[data-open]'); if (o) X.quickView(o.dataset.open);
+  const p = e.target.closest('[data-h]'); if (p) hero(+p.dataset.h);
+  const a = e.target.closest('[data-dir]'); if (a) { const row = a.parentElement.querySelector('.row'); row.scrollBy({ left: +a.dataset.dir * row.clientWidth * .9, behavior: 'smooth' }); }
+});
+X.toolbar('a');
+</script>
+</body>
+</html>

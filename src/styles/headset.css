@@ -1,0 +1,61 @@
+/* Headset view (html[data-view="headset"]): larger targets, bottom dock, max 3 columns. */
+
+.headset-dock { display: none; }
+.headset-library { position: fixed; z-index: 58; bottom: 6.5rem; left: 50%; width: min(24rem, calc(100vw - 2rem)); transform: translateX(-50%); }
+.headset-library .library-popover { position: static; width: 100%; }
+html[data-view="headset"] .site-topbar { display: none; }
+html[data-view="headset"] .headset-search-shell { display: flex; min-height: 3.5rem; align-items: center; gap: .65rem; padding-block: .45rem; color: var(--text-3); }
+html[data-view="headset"] .headset-search-shell svg { width: 1.2rem; height: 1.2rem; flex: none; }
+html[data-view="headset"] .headset-search-shell input { width: 100%; min-width: 0; height: 2.9rem; border: 0; border-radius: 999px; outline: none; padding: 0 1rem; background: var(--surface-1); color: var(--text); font-size: .9rem; }
+html[data-view="headset"] .headset-search-shell input:focus-visible { box-shadow: 0 0 0 2px var(--text); }
+html[data-view="headset"] .headset-search-shell kbd { color: var(--text-3); font-size: .7rem; white-space: nowrap; }
+html[data-view="headset"] .stage-section { padding-top: 1.75rem; }
+html[data-view="headset"] .stage-layout { grid-template-columns: minmax(0, 1.55fr) minmax(17rem, 1fr); gap: 2.5rem; }
+html[data-view="headset"] .stage-title { font-size: clamp(3rem, 4vw, 5rem); }
+html[data-view="headset"] .stage-hook { font-size: 1rem; }
+html[data-view="headset"] .stage-alternates { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+html[data-view="headset"] .stage-alternates .alternate:nth-child(n+5) { display: none; }
+html[data-view="headset"] .discovery-shell { top: 0; margin-top: 2rem; }
+html[data-view="headset"] .discovery-bar { min-height: 4.6rem; gap: .7rem; }
+html[data-view="headset"] .feed-tab { min-height: var(--target); padding-inline: 1rem; font-size: .95rem; }
+html[data-view="headset"] .chip { min-height: calc(var(--target) - .25rem); padding-inline: 1rem; font-size: .83rem; }
+html[data-view="headset"] .video-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2.6rem 1.45rem; }
+html[data-view="headset"] .card-title { font-size: .98rem; }
+html[data-view="headset"] .immersion-signature { gap: .5rem .85rem; font-size: .8rem; }
+html[data-view="headset"] .signature-icon { width: 1.2rem; height: 1.2rem; }
+html[data-view="headset"] .card-queue { width: var(--target); height: var(--target); opacity: 1; }
+html[data-view="headset"] .chapter-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+html[data-view="headset"] .chapter-cards .video-card:nth-child(n+4) { display: none; }
+html[data-view="headset"] .quickview-dialog { width: min(72rem, calc(100vw - 5rem)); }
+html[data-view="headset"] .quickview-title { font-size: 2.8rem; }
+html[data-view="headset"] .quickview-body { padding: 1.75rem 2rem 2rem; }
+html[data-view="headset"] .queue-dialog { right: 2rem; bottom: 6rem; }
+html[data-view="headset"] body { padding-bottom: 6.5rem; }
+html[data-view="headset"] .headset-dock { position: fixed; z-index: 55; right: 50%; bottom: 1rem; display: flex; align-items: center; gap: .3rem; padding: .4rem; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--surface-2); transform: translateX(50%); }
+html[data-view="headset"] .headset-dock button { display: inline-flex; min-width: 5rem; min-height: var(--target); align-items: center; justify-content: center; gap: .45rem; padding: 0 .85rem; border: 0; border-radius: 999px; background: transparent; color: var(--text-2); font-size: .8rem; font-weight: 600; white-space: nowrap; cursor: pointer; }
+html[data-view="headset"] .headset-dock button[aria-current="true"] { background: var(--text); color: var(--bg); }
+html[data-view="headset"] .headset-dock svg { width: 1.25rem; height: 1.25rem; flex: none; }
+html[data-view="headset"] .headset-dock .queue-count { min-width: 1.3rem; height: 1.3rem; }
+html[data-view="headset"] .results-count { display: none; }
+html[data-view="headset"] .video-card { scroll-margin-top: 5rem; scroll-snap-align: start; }
+html[data-view="headset"] .feed-section { scroll-snap-type: y proximity; }
+
+@media (max-width: 900px) {
+  html[data-view="headset"] .stage-layout { grid-template-columns: 1fr; gap: 1.4rem; }
+  html[data-view="headset"] .stage-title { max-width: 14ch; font-size: clamp(3.2rem, 8vw, 5rem); }
+  html[data-view="headset"] .video-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  html[data-view="headset"] .chapter-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  html[data-view="headset"] .discovery-bar { flex-wrap: wrap; padding-block: .55rem; }
+  html[data-view="headset"] .intent-list { order: 2; flex-basis: 100%; }
+}
+
+@media (max-width: 640px) {
+  html[data-view="headset"] { font-size: 18px; }
+  html[data-view="headset"] .stage-title { font-size: 3rem; }
+  html[data-view="headset"] .video-grid { grid-template-columns: 1fr; }
+  html[data-view="headset"] .chapter-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  html[data-view="headset"] .headset-dock { right: .5rem; left: .5rem; justify-content: space-between; transform: none; }
+  html[data-view="headset"] .headset-dock button { min-width: 0; flex: 1; padding-inline: .4rem; }
+  html[data-view="headset"] .headset-dock .dock-label { display: none; }
+  html[data-view="headset"] .quickview-dialog { width: 100%; }
+}

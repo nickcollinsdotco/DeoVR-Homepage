@@ -1,0 +1,44 @@
+/* Design tokens: OKLCH colour, type, spacing, motion. Headset view swaps a few tokens. */
+
+@theme {
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-archivo), var(--font-inter), sans-serif;
+  --color-canvas: oklch(0.155 0.006 60);
+  --color-surface: oklch(0.19 0.006 60);
+  --color-raised: oklch(0.23 0.007 60);
+  --color-accent: oklch(0.7 0.19 2);
+}
+
+:root {
+  color-scheme: dark;
+  --bg: oklch(0.155 0.006 60);
+  --surface-1: oklch(0.19 0.006 60);
+  --surface-2: oklch(0.23 0.007 60);
+  --surface-3: oklch(0.28 0.008 60);
+  --line: oklch(1 0 0 / 0.08);
+  --line-strong: oklch(1 0 0 / 0.16);
+  --text: oklch(0.94 0.006 80);
+  --text-2: oklch(0.76 0.008 80);
+  --text-3: oklch(0.6 0.008 80);
+  --accent: oklch(0.7 0.19 2);
+  --accent-ink: oklch(0.18 0.02 2);
+  --still: oklch(0.8 0.1 170);
+  --moving: oklch(0.82 0.13 75);
+  --scrim: oklch(0.155 0.006 60 / 0.92);
+  --target: 2.75rem;
+  --ease: cubic-bezier(.2, .7, .2, 1);
+  --d1: 150ms;
+  --d2: 220ms;
+  --d3: 420ms;
+  --radius: 8px;
+  --gutter: clamp(1.25rem, 3.2vw, 3.5rem);
+  --max-width: 1760px;
+  font-size: 16px;
+}
+
+html[data-view="headset"] {
+  font-size: 20px;
+  --target: 4rem;
+  --text-2: oklch(0.82 0.008 80);
+  --text-3: oklch(0.7 0.008 80);
+}

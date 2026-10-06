@@ -1,7 +1,7 @@
 # DeoVR Homepage: Design Direction
 
 Codename: **Viewfinder**
-Status: direction chosen after coded exploration (`explore/`); approved for implementation
+Status: implemented. Structure from round 1 (§6), spatial layer from round 2 (§14). All five explorations are previewable at `/directions` (`public/directions/`).
 Last updated: 2026-10-06
 
 ---
@@ -167,13 +167,13 @@ Scored 1–5.
 | Shows product-design thinking | 2 | 4 | **5** |
 | **Total** | 24 | 28 | **35 → 36** |
 
-*Paper scores, before prototyping. Testing all three in code (`explore/`) changed the call: C was the most useful but felt safe, and B's weaknesses turned out to be fixable (see §6).*
+*Paper scores, before prototyping. Testing all three in code (`/directions`) changed the call: C was the most useful but felt safe, and B's weaknesses turned out to be fixable (see §6).*
 
 ---
 
 ## 6. Chosen direction: **Viewfinder** (B, with C's discovery layer)
 
-*Revised 2026-10-06 after testing all three as coded prototypes (`explore/`).*
+*Revised 2026-10-06 after testing all three as coded prototypes (`/directions`, A–C).*
 
 **Direction B "Viewfinder"** supplies the featured stage and a focusable strip of featured experiences. From **C "Field Guide"** we keep what makes the choice informed: the Immersion Signature, separating *what to see* from *how it feels*, quick view, the headset queue, and the grid as the main way to scan the catalogue.
 
@@ -216,14 +216,14 @@ Why not C: kept as the discovery layer, not the lead.
 
 ### Homepage, top to bottom
 
-1. **Featured stage**: a large editorial image with place, title, hook, Immersion Signature and **Watch in DeoVR**, **Headset queue** and **Details** actions. Three featured videos have committed high-resolution loops; other choices stay on their sharp cover.
-2. **Featured strip**: seven direct alternates instead of a hidden carousel. Pointer or keyboard focus selects the stage item; controller sized targets are available in headset mode.
+1. **Featured stage**: a real 360°/180° world you can drag to look around (self-hosted equirect loop for every featured item), with place, title, hook, Immersion Signature and **Step inside**, **Watch in VR**, **Queue** and **Details**. See §14.
+2. **Featured strip**: seven direct alternates instead of a hidden carousel. Pointer dwell or keyboard focus crossfades the stage world to that place; controller-sized targets in headset mode.
 3. **Discovery bar**: **For you / New / Trending**, subject chips and one Immersion filter for field of view, depth, clarity, camera-motion estimate and length. Filter state is linkable in the URL.
-4. **Discovery grid**: real videos, creator, social proof and the compact Immersion Signature. Dwell/focus previews play inside the card; selecting a card opens quick view instead of navigating away.
-5. **Editorial chapters**, **creators to follow**, **browse by category**, compact footer.
+4. **Discovery grid**: real videos, creator, social proof and the compact Immersion Signature. Dwell/focus turns an immersive card into a look-around portal (flat and premium videos play DeoVR's preview clip instead); selecting a card opens quick view instead of navigating away.
+5. **Editorial chapters** interleaved every two rows: "A quieter kind of somewhere" (still-camera places), **"Where in the world"** (360° places as little planets) and "Look closer" (8K stereo). Then **creators to follow** and a compact footer.
 
 ### Quick view (pre-flight)
-The dialog is deep-linkable with `?v=<id>`. It shows a high-resolution stage loop when one exists; otherwise it holds on the sharp cover. It includes creator, expanded Immersion Signature, comfort/flashing warnings, description, **Watch in DeoVR** / **Queue**, and more like this.
+The dialog is deep-linkable with `?v=<id>`. It opens on the same look-around world as the stage when an equirect source exists; otherwise it holds on the sharp cover. It includes creator, expanded Immersion Signature, comfort/flashing warnings, description, **Watch in DeoVR** / **Queue**, and more like this.
 
 ### Headset queue
 A tray listing queued videos, with total runtime. The queue is saved in this browser only; the UI says it is not synced with an account or headset.
@@ -340,7 +340,7 @@ The grid is container-query driven where possible; type scales with `clamp()`; t
 
 ## 14. Revision (6 Oct 2026): Window, made literal
 
-After the foundation above, we prototyped two WebGL spikes (`explore/portals.html`, `explore/insideout.html`) and changed one rule: **3D is allowed when it shows the content's real geometry, never as decoration.** DeoVR serves full equirectangular source files, so the homepage can show what being there looks like instead of a flat thumbnail.
+After the foundation above, we prototyped two WebGL spikes (`/directions` D and E) and changed one rule: **3D is allowed when it shows the content's real geometry, never as decoration.** DeoVR serves full equirectangular source files, so the homepage can show what being there looks like instead of a flat thumbnail.
 
 What changed:
 - **Real media.** `scripts/media.mjs` extracts a left-eye equirect still per immersive video and short stage loops from DeoVR's own files, self-hosted (signed source URLs expire after 24h).

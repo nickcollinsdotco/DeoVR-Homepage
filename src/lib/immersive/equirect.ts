@@ -93,7 +93,6 @@ export function createView(canvas: HTMLCanvasElement, { alpha = true } = {}) {
   const dispose = () => { material.dispose(); renderer.dispose(); };
   return { renderer, u, fit, draw, dispose };
 }
-export type EqView = ReturnType<typeof createView>;
 
 const stills = new Map<string, THREE.Texture>();
 const loader = new THREE.TextureLoader();

@@ -1,0 +1,26 @@
+/* Headset queue tray and toast. */
+
+.queue-dialog { inset: auto max(1.5rem, calc((100vw - var(--max-width)) / 2)) 1.25rem auto; width: min(27rem, calc(100vw - 2rem)); max-height: min(75vh, 42rem); overflow: auto; border-radius: 8px; }
+.queue-heading { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 1.05rem; border-bottom: 1px solid var(--line); background: var(--surface-1); }
+.queue-heading h2 { margin: 0; font-family: var(--font-archivo), sans-serif; font-size: 1.55rem; letter-spacing: -.04em; }
+.queue-heading .icon-close { display: grid; width: 2.5rem; height: 2.5rem; place-items: center; border: 0; border-radius: 50%; background: var(--surface-2); cursor: pointer; }
+.queue-heading .icon-close svg { width: 1.1rem; height: 1.1rem; }
+.queue-content { padding: .8rem 1.05rem 1rem; }
+.queue-empty { display: grid; justify-items: center; gap: .5rem; padding: 2.5rem 1rem; text-align: center; }
+.queue-empty svg { width: 2rem; height: 2rem; color: var(--text-3); }
+.queue-empty p { max-width: 28ch; margin: 0; color: var(--text-2); font-size: .85rem; }
+.queue-items { display: grid; gap: .45rem; }
+.queue-item { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr) auto; align-items: center; gap: .7rem; padding: .55rem 0; border-bottom: 1px solid var(--line); }
+.queue-item img { width: 5.5rem; aspect-ratio: 5 / 3; object-fit: cover; border-radius: 4px; }
+.queue-item-copy { min-width: 0; }
+.queue-item-copy strong, .queue-item-copy span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.queue-item-copy strong { font-size: .78rem; font-weight: 600; }
+.queue-item-copy span { margin-top: .25rem; color: var(--text-3); font-size: .68rem; }
+.queue-remove { display: grid; width: 2.5rem; height: 2.5rem; place-items: center; border: 0; border-radius: 50%; background: transparent; color: var(--text-3); cursor: pointer; }
+.queue-remove:hover { background: var(--surface-2); color: var(--text); }
+.queue-remove svg { width: 1rem; height: 1rem; }
+.queue-total { display: flex; justify-content: space-between; margin-top: .9rem; color: var(--text-2); font-size: .79rem; }
+.queue-disclaimer { margin: .7rem 0 0; color: var(--text-3); font-size: .68rem; line-height: 1.45; }
+.queue-actions { display: flex; justify-content: space-between; align-items: center; gap: .75rem; margin-top: 1rem; }
+.queue-actions .button { min-height: 2.65rem; font-size: .78rem; }
+.queue-feedback { position: fixed; z-index: 90; right: 1.25rem; bottom: 1.25rem; max-width: min(30rem, calc(100vw - 2rem)); padding: .75rem 1rem; border: 1px solid var(--line-strong); border-radius: 6px; background: var(--surface-2); color: var(--text); font-size: .82rem; box-shadow: 0 8px 32px #0005; }

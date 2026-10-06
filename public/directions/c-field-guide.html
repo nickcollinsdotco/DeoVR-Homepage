@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>C · Field Guide — DeoVR exploration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/directions.css">
+<style>
+  .wrap { max-width: 1760px; margin: 0 auto; padding: 0 var(--gutter); }
+
+  /* Top bar */
+  .top { position: sticky; top: 0; z-index: 50; background: var(--bg); }
+  .top .wrap { display: flex; align-items: center; gap: 1.5rem; height: 4rem; }
+  .nav { display: flex; gap: .25rem; }
+  .nav a { padding: .5rem .75rem; border-radius: 999px; color: var(--text-2); font-weight: 500; font-size: .9375rem; }
+  .nav a:hover { color: var(--text); }
+  .nav a[aria-current] { color: var(--text); }
+  .search { flex: 1; max-width: 30rem; margin-left: auto; display: flex; align-items: center; gap: .6rem; height: 2.5rem; padding: 0 1rem; border-radius: 999px; background: var(--surface-1); color: var(--text-3); font-size: .9375rem; box-shadow: inset 0 0 0 1px var(--line); }
+  .search svg { width: 1.1rem; }
+  .top-actions { display: flex; align-items: center; gap: .25rem; }
+  .qcount { min-width: 1.25rem; height: 1.25rem; padding: 0 .3rem; border-radius: 999px; background: var(--accent); color: var(--accent-ink); font-size: .7rem; font-weight: 700; display: inline-grid; place-items: center; }
+  .qcount:empty { display: none; }
+
+  /* Stage */
+  .stage { padding-top: 1.25rem; }
+  .stage-grid { display: grid; grid-template-columns: minmax(0, 1.85fr) minmax(20rem, 1fr); gap: clamp(1.5rem, 3vw, 3.5rem); align-items: end; }
+  .stage-media { border-radius: 10px; aspect-ratio: 5 / 3; }
+  .stage-media > img { transition: opacity var(--d3) var(--ease), transform 1.2s var(--ease); }
+  .stage-media.swap > img { opacity: 0; transform: scale(1.015); }
+  .stage-info { padding-bottom: .5rem; display: grid; gap: 1.1rem; }
+  .eyebrow { font-size: .75rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--text-3); }
+  .eyebrow b { color: var(--accent); font-weight: 600; }
+  .stage-place { color: var(--text-2); font-size: .9375rem; margin-bottom: .35rem; }
+  .stage-title { margin: 0; font-family: var(--font-display); font-weight: 750; font-stretch: 78%; font-size: clamp(2.75rem, 4.6vw, 5rem); line-height: .92; letter-spacing: -0.015em; text-wrap: balance; }
+  .stage-hook { margin: 0; color: var(--text-2); font-size: 1.0625rem; max-width: 34ch; text-wrap: pretty; }
+  .stage .sig { font-size: .875rem; }
+  .stage .sig svg { width: 1.15rem; height: 1.15rem; }
+  .creator { display: flex; align-items: center; gap: .6rem; font-size: .9rem; font-weight: 500; }
+  .creator span { color: var(--text-3); font-weight: 400; }
+  .actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+
+  .alts { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: .75rem; margin-top: 1.25rem; }
+  .alt { text-align: left; display: grid; gap: .45rem; padding: 0; border-radius: var(--radius); }
+  .alt .media { border-radius: 6px; transition: transform var(--d2) var(--ease); }
+  .alt .media::after { content: ''; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 2px transparent; transition: box-shadow var(--d2) var(--ease); }
+  .alt[aria-current="true"] .media::after { box-shadow: inset 0 0 0 2px var(--text); }
+  .alt:not([aria-current="true"]) .media img { filter: brightness(.7); transition: filter var(--d2) var(--ease); }
+  .alt:hover .media img { filter: none; }
+  .alt-t { font-size: .8125rem; font-weight: 600; line-height: 1.25; color: var(--text-2); }
+  .alt[aria-current="true"] .alt-t { color: var(--text); }
+  .alt-p { font-size: .75rem; color: var(--text-3); }
+
+  /* Discovery bar */
+  .disc { position: sticky; top: 4rem; z-index: 40; background: var(--bg); margin-top: 3rem; }
+  .disc .wrap { display: flex; align-items: center; gap: 1rem; padding-top: .75rem; padding-bottom: .75rem; box-shadow: 0 1px 0 var(--line); }
+  .feeds { display: flex; gap: .25rem; }
+  .feeds button { padding: .45rem .1rem; margin: 0 .55rem; font-weight: 600; font-size: 1rem; color: var(--text-3); box-shadow: inset 0 -2px 0 transparent; border-radius: 0; }
+  .feeds button[aria-selected="true"] { color: var(--text); box-shadow: inset 0 -2px 0 var(--accent); }
+  .vsep { width: 1px; height: 1.5rem; background: var(--line-strong); flex: none; }
+  .intents { display: flex; gap: .4rem; overflow-x: auto; scrollbar-width: none; flex: 1; mask-image: linear-gradient(90deg, #000 92%, transparent); }
+  .imm { position: relative; }
+  .imm-btn[aria-expanded="true"], .imm-btn.has { background: var(--surface-2); color: var(--text); }
+  .imm-n { color: var(--accent); }
+  .pop { position: absolute; right: 0; top: calc(100% + .5rem); width: 26rem; padding: 1.25rem; border-radius: 12px; background: var(--surface-2); box-shadow: 0 0 0 1px var(--line), 0 20px 40px oklch(0 0 0 / .4); display: grid; gap: 1.1rem; }
+  .pop[hidden] { display: none; }
+  .fg-label { font-size: .7rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); margin-bottom: .5rem; }
+  .fg { display: flex; flex-wrap: wrap; gap: .4rem; }
+  .pop-foot { display: flex; justify-content: space-between; align-items: center; font-size: .875rem; color: var(--text-2); }
+  .result { font-size: .875rem; color: var(--text-3); white-space: nowrap; }
+
+  /* Grid */
+  .feed { padding-top: 1.75rem; padding-bottom: 4rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(17.5rem, 1fr)); gap: 2.25rem 1.25rem; }
+  .card { position: relative; display: grid; gap: .7rem; }
+  .card .media { transition: transform var(--d2) var(--ease); }
+  .card .media img { transition: filter var(--d2) var(--ease); }
+  .card:hover .media, .card:focus-within .media { transform: scale(1.02); }
+  .card:hover .media img { filter: brightness(1.06); }
+  .card-hit { position: absolute; inset: 0; z-index: 1; border-radius: var(--radius); }
+  .card-hit:focus-visible { outline-offset: 4px; }
+  .card-body { display: grid; grid-template-columns: auto 1fr; gap: .2rem .7rem; }
+  .card-body .avatar { grid-row: span 3; margin-top: .1rem; }
+  .card-title { margin: 0; font-size: .9875rem; font-weight: 600; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .card-meta { font-size: .8125rem; color: var(--text-3); }
+  .card .sig { margin-top: .3rem; }
+  .card-q { position: absolute; z-index: 2; right: .5rem; top: .5rem; width: 2.25rem; height: 2.25rem; border-radius: 999px; display: grid; place-items: center; background: oklch(0.12 0.005 60 / .78); color: var(--text); opacity: 0; transition: opacity var(--d1) var(--ease); }
+  .card-q svg { width: 1.1rem; }
+  .card:hover .card-q, .card:focus-within .card-q, .card-q[aria-pressed="true"] { opacity: 1; }
+  .card-q[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+
+  /* Chapters */
+  .chapter { grid-column: 1 / -1; margin: 1.5rem 0; padding: 2rem 0 0; border-top: 1px solid var(--line); }
+  .chapter-head { display: flex; align-items: end; justify-content: space-between; gap: 2rem; margin-bottom: 1.5rem; }
+  .chapter h2 { margin: 0; font-family: var(--font-display); font-weight: 700; font-stretch: 80%; font-size: clamp(2rem, 3vw, 2.75rem); line-height: 1; }
+  .chapter p { margin: .5rem 0 0; color: var(--text-2); max-width: 46ch; }
+  .chapter-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.25rem; }
+  .chapter-glyph { display: inline-flex; vertical-align: -.1em; margin-right: .5rem; }
+  .chapter-glyph svg { width: .8em; height: .8em; }
+
+  /* Creators */
+  .creators { padding-top: 1rem; padding-bottom: 5rem; }
+  .creators h2 { font-family: var(--font-display); font-weight: 700; font-stretch: 80%; font-size: 2rem; margin: 0 0 1.25rem; }
+  .crow { display: grid; grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr)); gap: 1rem; }
+  .cr { display: flex; align-items: center; gap: .8rem; padding: .9rem; border-radius: 10px; background: var(--surface-1); }
+  .cr .avatar { width: 3rem; height: 3rem; }
+  .cr b { display: block; font-size: .9375rem; }
+  .cr span { font-size: .8125rem; color: var(--text-3); }
+  footer { border-top: 1px solid var(--line); padding: 2rem 0 3rem; color: var(--text-3); font-size: .8125rem; }
+
+  .dock { display: none; }
+
+  /* ---------- Headset view ---------- */
+  html[data-view="headset"] .top { display: none; }
+  html[data-view="headset"] .disc { top: 0; }
+  html[data-view="headset"] .stage-grid { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); }
+  html[data-view="headset"] .alts { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  html[data-view="headset"] .alts .alt:nth-child(n+5) { display: none; }
+  html[data-view="headset"] .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2.5rem 1.5rem; }
+  html[data-view="headset"] .chapter-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  html[data-view="headset"] .chapter-row > :nth-child(4) { display: none; }
+  html[data-view="headset"] .card-q { opacity: 1; width: var(--target); height: var(--target); }
+  html[data-view="headset"] .feeds button { min-height: var(--target); }
+  html[data-view="headset"] .card-title { font-size: 1rem; }
+  html[data-view="headset"] .result { display: none; }
+  html[data-view="headset"] .feed { scroll-snap-type: y proximity; }
+  html[data-view="headset"] .card { scroll-snap-align: start; scroll-margin-top: 5rem; }
+  html[data-view="headset"] body { padding-bottom: 7rem; }
+  html[data-view="headset"] .dock {
+    display: flex; position: fixed; z-index: 60; left: 50%; bottom: 1.25rem; transform: translateX(-50%);
+    gap: .35rem; padding: .4rem; border-radius: 999px; background: var(--surface-2); box-shadow: 0 0 0 1px var(--line-strong);
+  }
+  .dock button { min-height: var(--target); padding: 0 1.25rem; border-radius: 999px; display: inline-flex; align-items: center; gap: .55rem; font-weight: 600; font-size: .9rem; color: var(--text-2); }
+  .dock button svg { width: 1.3rem; height: 1.3rem; }
+  .dock button[aria-current="true"] { background: var(--text); color: var(--bg); }
+
+  @media (max-width: 1100px) {
+    .stage-grid { grid-template-columns: 1fr; }
+    .alts { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .alts .alt:nth-child(n+5) { display: none; }
+    .nav { display: none; }
+    .chapter-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 640px) {
+    .search span { display: none; } .search { max-width: 2.5rem; padding: 0 .7rem; }
+    .disc .wrap { flex-wrap: wrap; }
+    .intents { order: 3; flex-basis: 100%; }
+    .result { display: none; }
+    .pop { position: fixed; left: .75rem; right: .75rem; top: auto; bottom: .75rem; width: auto; }
+    .grid { grid-template-columns: 1fr; }
+    .alts { grid-template-columns: repeat(3, minmax(0, 1fr)); } .alts .alt:nth-child(n+4) { display: none; }
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a href="#" aria-label="DeoVR home" id="logo"></a>
+    <nav class="nav" aria-label="Primary">
+      <a href="#" aria-current="page">Videos</a><a href="#">Photos</a><a href="#">Channels</a><a href="#">Passthrough</a><a href="#">Premium</a>
+    </nav>
+    <div class="search" role="search"><span id="i-search"></span><span>Search places, creators, moments</span></div>
+    <div class="top-actions">
+      <button class="btn btn-ghost" id="q-btn"><span id="i-queue"></span>Queue <span class="qcount" id="qcount"></span></button>
+      <button class="btn btn-secondary">Sign in</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="stage wrap" aria-labelledby="stage-title">
+    <div class="stage-grid">
+      <div class="media stage-media" id="stage-media" data-preview-host></div>
+      <div class="stage-info" id="stage-info" aria-live="polite"></div>
+    </div>
+    <div class="alts" id="alts" role="tablist" aria-label="Featured experiences"></div>
+  </section>
+
+  <div class="disc">
+    <div class="wrap">
+      <div class="feeds" role="tablist" aria-label="Feed" id="feeds">
+        <button role="tab" data-feed="forYou" aria-selected="true">For you</button>
+        <button role="tab" data-feed="new" aria-selected="false">New</button>
+        <button role="tab" data-feed="trending" aria-selected="false">Trending</button>
+      </div>
+      <span class="vsep"></span>
+      <div class="intents" id="intents" aria-label="Topics"></div>
+      <div class="imm">
+        <button class="chip imm-btn" id="imm-btn" aria-expanded="false" aria-controls="pop"><span id="i-sliders"></span>Immersion <span class="imm-n" id="imm-n"></span></button>
+        <div class="pop" id="pop" hidden></div>
+      </div>
+      <span class="result tnum" id="result" aria-live="polite"></span>
+    </div>
+  </div>
+
+  <section class="feed wrap" aria-label="Videos">
+    <h2 class="sr-only">Videos</h2>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section class="creators wrap" aria-labelledby="cr-h">
+    <h2 id="cr-h">Creators to follow</h2>
+    <div class="crow" id="crow"></div>
+  </section>
+</main>
+<footer><div class="wrap">© 2026 DeoVR · About · Help Center · Creator Handbook · Privacy · Terms</div></footer>
+
+<nav class="dock" aria-label="Headset navigation">
+  <button aria-current="true" id="d-home"></button><button id="d-search"></button><button id="d-queue"></button><button id="d-lib"></button>
+</nav>
+
+<script src="assets/data.js"></script>
+<script src="assets/directions.js"></script>
+<script>
+const { videos, featured, channels, icon, logo, esc, dur, count, age, cleanTitle, signature, fovGlyph, comfortGlyph, queue } = X;
+document.getElementById('logo').innerHTML = logo;
+document.getElementById('i-search').outerHTML = icon.search;
+document.getElementById('i-queue').outerHTML = icon.queue;
+document.getElementById('i-sliders').outerHTML = icon.sliders;
+document.getElementById('d-home').innerHTML = icon.home + 'Home';
+document.getElementById('d-search').innerHTML = icon.search + 'Search';
+document.getElementById('d-queue').innerHTML = icon.queue + 'Queue <span class="qcount" id="qcount2"></span>';
+document.getElementById('d-lib').innerHTML = icon.library + 'Library';
+
+/* ---------- Stage ---------- */
+let stageIdx = 0;
+function renderStage(i, animate) {
+  stageIdx = i;
+  const v = featured[i], c = channels.get(v.channel) || {};
+  const m = document.getElementById('stage-media');
+  const paint = () => {
+    X.stopPreview();
+    m.dataset.preview = v.preview;
+    m.innerHTML = `<img src="${v.cover.lg}" alt="" fetchpriority="high">`;
+    requestAnimationFrame(() => m.classList.remove('swap'));
+    setTimeout(() => X.startPreview(m), 900);
+  };
+  if (animate) { m.classList.add('swap'); setTimeout(paint, 220); } else paint();
+  const queued = queue.has(v.slug);
+  document.getElementById('stage-info').innerHTML = `
+    <div class="eyebrow"><b>Featured</b> · Staff pick</div>
+    <div>
+      <div class="stage-place">${esc(v.place)}</div>
+      <h1 class="stage-title" id="stage-title">${esc(v.headline)}</h1>
+    </div>
+    <p class="stage-hook">${esc(v.hook)}</p>
+    ${signature(v, { length: true })}
+    <div class="creator"><img class="avatar" src="${c.avatar}" alt="">${esc(c.name)}<span>${count(v.views)} views</span></div>
+    <div class="actions">
+      <button class="btn btn-primary">${icon.headset}Watch in VR</button>
+      <button class="btn btn-secondary" data-q="${v.slug}" aria-pressed="${queued}">${queued ? icon.check + 'Queued' : icon.plus + 'Queue'}</button>
+      <button class="btn btn-ghost" data-open="${v.slug}">Details</button>
+    </div>`;
+  document.querySelectorAll('.alt').forEach((a, j) => { a.setAttribute('aria-current', j === i); a.setAttribute('aria-selected', j === i); a.tabIndex = j === i ? 0 : -1; });
+}
+document.getElementById('alts').innerHTML = featured.map((v, i) => `
+  <button class="alt" role="tab" data-i="${i}">
+    <div class="media"><img src="${v.cover.sm || v.cover.lg}" alt="" loading="lazy"></div>
+    <div><div class="alt-t">${esc(v.headline)}</div><div class="alt-p">${esc(v.place)}</div></div>
+  </button>`).join('');
+document.getElementById('alts').addEventListener('click', (e) => { const a = e.target.closest('.alt'); if (a) renderStage(+a.dataset.i, true); });
+document.getElementById('alts').addEventListener('keydown', (e) => {
+  const d = { ArrowRight: 1, ArrowLeft: -1 }[e.key]; if (!d) return;
+  const n = (stageIdx + d + featured.length) % featured.length; renderStage(n, true); document.querySelectorAll('.alt')[n].focus();
+});
+renderStage(0);
+
+/* ---------- Discovery state ---------- */
+const INTENTS = [['all', 'All'], ['travel', 'Travel'], ['city', 'City walks'], ['nature', 'Nature & calm'], ['music', 'Music & events'], ['adrenaline', 'Adrenaline'], ['stories', 'Stories & animation'], ['passthrough', 'Passthrough']];
+const FILTERS = {
+  fov: { label: 'Field of view', opts: [['180', `${fovGlyph(180)}180°`], ['360', `${fovGlyph(360)}360°`]] },
+  depth: { label: 'Depth', opts: [['3D', '3D'], ['2D', '2D']] },
+  clarity: { label: 'Clarity', opts: [['8K', '8K'], ['6K+', '6K and up'], ['60fps', '60fps+']] },
+  comfort: { label: 'Camera comfort', opts: [['still', `${comfortGlyph('still')}Still only`], ['nomove', `${comfortGlyph('gentle')}No fast motion`]] },
+  length: { label: 'Length', opts: [['short', 'Under 10 min'], ['mid', '10–30 min'], ['long', '30 min+']] },
+};
+const url = new URL(location.href);
+const state = { feed: url.searchParams.get('feed') || 'forYou', intent: url.searchParams.get('intent') || 'all', f: {} };
+for (const k in FILTERS) if (url.searchParams.get(k)) state.f[k] = url.searchParams.get(k);
+function sync() {
+  const u = new URL(location.href);
+  ['feed', 'intent', ...Object.keys(FILTERS)].forEach((k) => u.searchParams.delete(k));
+  if (state.feed !== 'forYou') u.searchParams.set('feed', state.feed);
+  if (state.intent !== 'all') u.searchParams.set('intent', state.intent);
+  for (const [k, v] of Object.entries(state.f)) u.searchParams.set(k, v);
+  history.replaceState(null, '', u);
+}
+const match = (v) => {
+  if (state.intent !== 'all' && !v.intents.includes(state.intent)) return false;
+  const f = state.f;
+  if (f.fov === '180' && !(v.fov > 0 && v.fov < 360)) return false;
+  if (f.fov === '360' && v.fov !== 360) return false;
+  if (f.depth && v.depth !== f.depth) return false;
+  if (f.clarity === '8K' && v.clarity !== '8K') return false;
+  if (f.clarity === '6K+' && !['8K', '7K', '6K'].includes(v.clarity)) return false;
+  if (f.clarity === '60fps' && v.fps < 50) return false;
+  if (f.comfort === 'still' && v.comfort !== 'still') return false;
+  if (f.comfort === 'nomove' && v.comfort === 'moving') return false;
+  const m = v.durationSec / 60;
+  if (f.length === 'short' && m >= 10) return false;
+  if (f.length === 'mid' && (m < 10 || m > 30)) return false;
+  if (f.length === 'long' && m < 30) return false;
+  return true;
+};
+const sorters = {
+  forYou: (a, b) => (a.feeds.home ?? 999) - (b.feeds.home ?? 999) || b.views - a.views,
+  new: (a, b) => new Date(b.publishedAt) - new Date(a.publishedAt),
+  trending: (a, b) => (a.feeds.trending ?? 999) - (b.feeds.trending ?? 999) || b.likes - a.likes,
+};
+
+/* ---------- Cards ---------- */
+function card(v) {
+  const c = channels.get(v.channel) || {};
+  const title = cleanTitle(v.title);
+  return `<article class="card" data-preview-host>
+    <button class="card-hit" data-open="${v.slug}" aria-label="${esc(title)}, quick view"></button>
+    <div class="media" data-preview="${v.preview}">
+      <img src="${v.cover.sm || v.cover.lg}" alt="" loading="lazy" decoding="async">
+      <span class="badge br">${dur(v.durationSec)}</span>
+    </div>
+    <button class="card-q" data-q="${v.slug}" aria-pressed="${queue.has(v.slug)}" aria-label="Add to headset queue">${queue.has(v.slug) ? icon.check : icon.plus}</button>
+    <div class="card-body">
+      <img class="avatar" src="${c.avatar || ''}" alt="" loading="lazy">
+      <h3 class="card-title" title="${esc(v.title)}">${esc(title)}</h3>
+      <div class="card-meta">${esc(c.name || v.channel)} · ${age(v.publishedAt)} · ${count(v.views)} views</div>
+      ${signature(v)}
+    </div>
+  </article>`;
+}
+function chapter(title, glyph, text, items) {
+  if (items.length < 3) return '';
+  return `<section class="chapter"><div class="chapter-head"><div><h2><span class="chapter-glyph">${glyph}</span>${title}</h2><p>${text}</p></div>
+    <button class="btn btn-ghost">See all ${icon.chevron}</button></div>
+    <div class="chapter-row">${items.slice(0, 4).map(card).join('')}</div></section>`;
+}
+
+function render() {
+  const list = videos.filter(match).sort(sorters[state.feed]);
+  const filtered = state.intent !== 'all' || Object.keys(state.f).length;
+  let html = '';
+  const shown = new Set();
+  list.slice(0, 32).forEach((v, i) => {
+    if (!filtered && i === 8) {
+      const calm = videos.filter((x) => x.comfort === 'still' && x.durationSec < 900 && x.fov && !list.slice(0, 8).includes(x) && x.intents.some((t) => ['nature', 'travel', 'city'].includes(t))).sort((a, b) => b.views - a.views);
+      html += chapter('Calm places', comfortGlyph('still'), 'Still camera, under 15 minutes. An easy first watch, or the end of a long day.', calm);
+      calm.slice(0, 4).forEach((x) => shown.add(x.slug));
+    }
+    if (!filtered && i === 20) {
+      html += chapter('All the way around', fovGlyph(360), 'Full 360° — turn your head, or your chair, and the world keeps going.', videos.filter((x) => x.fov === 360 && !shown.has(x.slug)).sort((a, b) => b.views - a.views));
+    }
+    if (!shown.has(v.slug)) html += card(v);
+  });
+  if (!list.length) html = `<div style="grid-column:1/-1;padding:4rem 0;text-align:center;color:var(--text-2)">Nothing matches all of those. <button class="btn btn-ghost" id="reset2">Clear filters</button></div>`;
+  document.getElementById('grid').innerHTML = html;
+  document.getElementById('result').textContent = `${list.length} videos`;
+  document.getElementById('imm-n').textContent = Object.keys(state.f).length || '';
+  document.getElementById('imm-btn').classList.toggle('has', !!Object.keys(state.f).length);
+  document.querySelectorAll('#feeds [data-feed]').forEach((b) => b.setAttribute('aria-selected', b.dataset.feed === state.feed));
+  document.querySelectorAll('#intents .chip').forEach((b) => b.setAttribute('aria-pressed', b.dataset.intent === state.intent));
+  renderPop();
+  sync();
+}
+document.getElementById('intents').innerHTML = INTENTS.map(([k, l]) => `<button class="chip" data-intent="${k}">${l}</button>`).join('');
+function renderPop() {
+  const n = videos.filter(match).length;
+  document.getElementById('pop').innerHTML = Object.entries(FILTERS).map(([k, g]) => `
+    <div><div class="fg-label">${g.label}</div><div class="fg">${g.opts.map(([v, l]) => `<button class="chip" data-f="${k}" data-v="${v}" aria-pressed="${state.f[k] === v}">${l}</button>`).join('')}</div></div>`).join('') +
+    `<div class="pop-foot"><span class="tnum">${n} videos match</span><button class="btn btn-ghost" data-reset>Reset</button></div>`;
+}
+
+/* ---------- Events ---------- */
+document.addEventListener('click', (e) => {
+  const t = e.target;
+  const inPop = !!t.closest('#pop'); // check before re-render detaches the target
+  const feed = t.closest('[data-feed]'); if (feed) { state.feed = feed.dataset.feed; render(); }
+  const intent = t.closest('[data-intent]'); if (intent) { state.intent = intent.dataset.intent; render(); }
+  const f = t.closest('[data-f]'); if (f) { const { f: k, v } = f.dataset; state.f[k] === v ? delete state.f[k] : (state.f[k] = v); render(); }
+  if (t.closest('[data-reset]') || t.closest('#reset2')) { state.f = {}; state.intent = 'all'; render(); }
+  const open = t.closest('[data-open]'); if (open) X.quickView(open.dataset.open);
+  const q = t.closest('[data-q]'); if (q) { X.toggleQueue(q.dataset.q); }
+  const ib = t.closest('#imm-btn'), pop = document.getElementById('pop');
+  if (ib) { pop.hidden = !pop.hidden; ib.setAttribute('aria-expanded', !pop.hidden); }
+  else if (!inPop) { pop.hidden = true; document.getElementById('imm-btn').setAttribute('aria-expanded', 'false'); }
+});
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') document.getElementById('pop').hidden = true; });
+function paintQueue() {
+  const n = queue.size || '';
+  document.getElementById('qcount').textContent = n;
+  document.getElementById('qcount2').textContent = n;
+  document.querySelectorAll('[data-q]').forEach((b) => {
+    const on = queue.has(b.dataset.q); b.setAttribute('aria-pressed', on);
+    if (b.classList.contains('card-q')) b.innerHTML = on ? icon.check : icon.plus;
+    else b.innerHTML = on ? icon.check + 'Queued' : icon.plus + 'Queue';
+  });
+}
+X.onQueue(paintQueue);
+document.getElementById('crow').innerHTML = [...channels.values()].filter((c) => c.subscribers).sort((a, b) => b.subscribers - a.subscribers).slice(0, 8)
+  .map((c) => `<a class="cr" href="#"><img class="avatar" src="${c.avatar}" alt="" loading="lazy"><div><b>${esc(c.name)}</b><span>${count(c.subscribers)} subscribers · ${c.videoCount} videos</span></div></a>`).join('');
+X.bindPreviews(document.querySelector('main'));
+render(); paintQueue();
+X.toolbar('c');
+</script>
+</body>
+</html>

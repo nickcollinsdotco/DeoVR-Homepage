@@ -1,0 +1,47 @@
+/* Feed grid, video card, Immersion Signature. */
+
+.feed-section { padding-top: 1.5rem; padding-bottom: 5rem; }
+.feed-heading { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 1.15rem; }
+.feed-heading h2, .chapter-heading h2, .creator-section h2 { margin: 0; font-family: var(--font-archivo), var(--font-inter), sans-serif; font-size: clamp(1.75rem, 2.7vw, 2.55rem); font-weight: 600; letter-spacing: -.045em; line-height: 1.05; }
+.feed-heading p { margin: .35rem 0 0; color: var(--text-3); font-size: .82rem; }
+.video-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2.2rem 1.15rem; }
+.video-card { position: relative; min-width: 0; }
+.card-media { position: relative; overflow: hidden; aspect-ratio: 5 / 3; border-radius: var(--radius); background: var(--surface-1); isolation: isolate; }
+.card-media img, .card-media video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.card-media img { transition: transform var(--d2) var(--ease), filter var(--d2) var(--ease); }
+.video-card:hover .card-media img { filter: brightness(1.04); }
+.video-card:hover .card-media > img { transform: scale(1.015); }
+.card-media video { z-index: 1; opacity: 0; transition: opacity var(--d3) var(--ease); }
+.card-media video.is-playing { opacity: 1; }
+.card-open-media { position: absolute; z-index: 2; inset: 0; display: block; width: 100%; height: 100%; padding: 0; border: 0; background: transparent; text-align: left; cursor: pointer; }
+.duration-badge { position: absolute; z-index: 3; right: .45rem; bottom: .45rem; padding: .18rem .38rem; border-radius: 3px; background: oklch(0.12 0.005 60 / .86); color: var(--text); font-size: .7rem; font-weight: 600; }
+.premium-badge { position: absolute; z-index: 3; top: .45rem; left: .45rem; display: inline-flex; align-items: center; gap: .25rem; padding: .22rem .42rem; border-radius: 3px; background: oklch(0.12 0.005 60 / .8); color: var(--text); font-size: .65rem; font-weight: 600; }
+.premium-badge svg { width: .75rem; height: .75rem; color: var(--accent); }
+.duration-badge, .premium-badge { pointer-events: none; }
+.card-queue { position: absolute; z-index: 4; top: .45rem; right: .45rem; display: grid; width: 2.5rem; height: 2.5rem; place-items: center; padding: 0; border: 1px solid #ffffff30; border-radius: 50%; background: oklch(0.12 0.005 60 / .76); color: var(--text); opacity: 0; transition: opacity var(--d1), background var(--d1), color var(--d1); cursor: pointer; }
+.card-queue svg { width: 1.15rem; height: 1.15rem; }
+.video-card:hover .card-queue, .video-card:focus-within .card-queue, .card-queue[aria-pressed="true"] { opacity: 1; }
+.card-queue[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.card-copy { display: grid; gap: .48rem; padding-top: .68rem; }
+.card-title { display: -webkit-box; overflow: hidden; margin: 0; color: var(--text); font-size: .94rem; font-weight: 600; line-height: 1.32; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.card-title button { border: 0; padding: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.card-title button:hover { text-decoration: underline; text-decoration-color: var(--text-3); text-underline-offset: 3px; }
+.card-channel { overflow: hidden; color: var(--text-3); font-size: .75rem; text-overflow: ellipsis; white-space: nowrap; }
+.card-stats { display: flex; align-items: center; gap: .35rem; color: var(--text-3); font-size: .7rem; }
+.card-stats .stat-sep { color: var(--surface-3); }
+.immersion-signature { display: flex; min-width: 0; flex-wrap: wrap; align-items: center; gap: .38rem .75rem; color: var(--text-2); font-size: .72rem; font-weight: 500; }
+.signature-item { display: inline-flex; align-items: center; gap: .3rem; min-width: 0; white-space: nowrap; }
+.signature-icon { display: inline-flex; width: 1rem; height: 1rem; align-items: center; justify-content: center; flex: none; color: var(--text-2); }
+.signature-icon svg { display: block; width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.signature-item-fov { color: var(--text); }
+.signature-item-comfort.signature-comfort-still .signature-icon { color: var(--still); }
+.signature-item-comfort.signature-comfort-moving .signature-icon { color: var(--moving); }
+.sig-depth-glyph { font-size: .57rem; font-weight: 700; letter-spacing: -.06em; }
+.sig-resolution-glyph { font-size: .55rem; font-weight: 700; letter-spacing: -.09em; }
+.length-symbol { font-family: var(--font-inter), sans-serif; font-size: 1rem; line-height: 1; }
+.signature-detail { min-width: 0; padding: .85rem .95rem; background: var(--surface-1); }
+.signature-expanded { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1px; overflow: hidden; margin: 0; border: 1px solid var(--line); border-radius: var(--radius); background: var(--line); }
+.signature-detail dt { display: flex; align-items: center; gap: .4rem; color: var(--text-3); font-size: .64rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+.signature-detail dt svg { width: 1.05rem; height: 1.05rem; color: var(--text-2); fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.signature-detail dd { margin: .42rem 0 0; font-size: .93rem; font-weight: 600; }
+.signature-detail dd small { display: block; margin-top: .2rem; color: var(--text-3); font-size: .7rem; font-weight: 400; line-height: 1.4; }
