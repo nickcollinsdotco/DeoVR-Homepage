@@ -59,9 +59,14 @@ export const equirectFor = (video: Video) => (video.fov >= 180 ? media[video.id]
 /** Short self-hosted equirect loop, only for featured videos. */
 export const stageLoopFor = (video: Video) => media[video.id]?.loop;
 
+// Narrative and studio categories that can co-occur with "nature" or "travel" tags.
+const NOT_A_PLACE = ["story", "lesson", "horror", "cgi", "anime", "gameplay", "cosplay", "ai-generated", "passthrough"];
+
+/** A real place you'd go and stand in, rather than a story, performance or render. */
 const isPlace = (video: Video) =>
   video.intents.some((intent) => intent === "travel" || intent === "nature" || intent === "city")
-  && !video.intents.includes("stories") && !video.intents.includes("passthrough");
+  && !video.intents.includes("stories")
+  && !video.categories.some((category) => NOT_A_PLACE.includes(category));
 
 export function getFeaturedVideos() {
   return FEATURED.flatMap(({ slug }) => videoBySlug.get(slug) ?? []);

@@ -139,7 +139,8 @@ Covers use `next/image` with `unoptimized` (DeoVR's CDN already serves right-siz
 ## 7. Responsive and headset
 
 - Breakpoints per design doc §12 (`src/styles/responsive.css`): 4 → 3 → 1 grid columns, stage stacks under 820px, discovery chips wrap, quick view becomes a bottom sheet.
-- Headset view (`src/styles/headset.css`): root font 20px, `--target: 4rem`, top bar replaced by `HeadsetDock`, search moves into the discovery bar, max 3 columns, row scroll snapping. Enabled by UA (`OculusBrowser`, Pico, Wolvic, visionOS), `?view=headset`, or the toggle.
+- Headset view (`src/styles/headset.css`): root font 20px, `--target: 4rem`, top bar replaced by `HeadsetDock`, search moves into the discovery bar, max 3 columns, row scroll snapping.
+- **One persistent control layer in headset view.** The dock is a solid full-width band at the bottom, and the discovery bar is not sticky, so fixed controls never stack over other controls (a jittery controller ray would hit whichever is in front). Enabled by UA (`OculusBrowser`, Pico, Wolvic, visionOS), `?view=headset`, or the toggle.
 
 ---
 

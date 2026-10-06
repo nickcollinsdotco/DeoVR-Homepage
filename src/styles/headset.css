@@ -15,7 +15,9 @@ html[data-view="headset"] .stage-title { font-size: clamp(3rem, 4vw, 5rem); }
 html[data-view="headset"] .stage-hook { font-size: 1rem; }
 html[data-view="headset"] .stage-alternates { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 html[data-view="headset"] .stage-alternates .alternate:nth-child(n+5) { display: none; }
-html[data-view="headset"] .discovery-shell { top: 0; margin-top: 2rem; }
+/* One persistent control layer in headset view: the dock. The discovery bar scrolls with the page,
+   so two fixed layers never stack (a controller ray would hit whichever is in front). */
+html[data-view="headset"] .discovery-shell { position: static; margin-top: 2rem; background: none; backdrop-filter: none; }
 html[data-view="headset"] .discovery-bar { min-height: 4.6rem; gap: .7rem; }
 html[data-view="headset"] .feed-tab { min-height: var(--target); padding-inline: 1rem; font-size: .95rem; }
 html[data-view="headset"] .chip { min-height: calc(var(--target) - .25rem); padding-inline: 1rem; font-size: .83rem; }
@@ -30,8 +32,10 @@ html[data-view="headset"] .quickview-dialog { width: min(72rem, calc(100vw - 5re
 html[data-view="headset"] .quickview-title { font-size: 2.8rem; }
 html[data-view="headset"] .quickview-body { padding: 1.75rem 2rem 2rem; }
 html[data-view="headset"] .queue-dialog { right: 2rem; bottom: 6rem; }
-html[data-view="headset"] body { padding-bottom: 6.5rem; }
-html[data-view="headset"] .headset-dock { position: fixed; z-index: 55; right: 50%; bottom: 1rem; display: flex; align-items: center; gap: .3rem; padding: .4rem; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--surface-2); transform: translateX(50%); }
+html[data-view="headset"] body { padding-bottom: 7.5rem; }
+/* A solid full-width band, not a pill floating over content: content scrolls cleanly behind a frame. */
+html[data-view="headset"] .headset-dock { position: fixed; z-index: 55; right: 0; bottom: 0; left: 0; display: flex; align-items: center; justify-content: center; gap: .5rem; padding: .75rem var(--gutter) calc(.75rem + env(safe-area-inset-bottom)); border-top: 1px solid var(--line-strong); background: var(--bg); }
+html[data-view="headset"] .queue-feedback { bottom: 7rem; }
 html[data-view="headset"] .headset-dock button { display: inline-flex; min-width: 5rem; min-height: var(--target); align-items: center; justify-content: center; gap: .45rem; padding: 0 .85rem; border: 0; border-radius: 999px; background: transparent; color: var(--text-2); font-size: .8rem; font-weight: 600; white-space: nowrap; cursor: pointer; }
 html[data-view="headset"] .headset-dock button[aria-current="true"] { background: var(--text); color: var(--bg); }
 html[data-view="headset"] .headset-dock svg { width: 1.25rem; height: 1.25rem; flex: none; }
@@ -54,7 +58,7 @@ html[data-view="headset"] .feed-section { scroll-snap-type: y proximity; }
   html[data-view="headset"] .stage-title { font-size: 3rem; }
   html[data-view="headset"] .video-grid { grid-template-columns: 1fr; }
   html[data-view="headset"] .chapter-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  html[data-view="headset"] .headset-dock { right: .5rem; left: .5rem; justify-content: space-between; transform: none; }
+  html[data-view="headset"] .headset-dock { justify-content: space-between; gap: .25rem; }
   html[data-view="headset"] .headset-dock button { min-width: 0; flex: 1; padding-inline: .4rem; }
   html[data-view="headset"] .headset-dock .dock-label { display: none; }
   html[data-view="headset"] .quickview-dialog { width: 100%; }

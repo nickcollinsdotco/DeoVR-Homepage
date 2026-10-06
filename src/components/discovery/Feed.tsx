@@ -15,6 +15,8 @@ import EditorialChapter from "@/components/chapters/EditorialChapter";
 import PlacesChapter from "@/components/chapters/PlacesChapter";
 
 const PAGE = 24;
+// Chapters break the grid every 12 cards: whole rows at 4, 3, 2 and 1 columns.
+const CHUNK = 12;
 const ARROWS: Record<string, "next" | "prev" | "down" | "up"> = { ArrowRight: "next", ArrowLeft: "prev", ArrowDown: "down", ArrowUp: "up" };
 
 function feedTitle(filters: Filters) {
@@ -25,7 +27,7 @@ function feedTitle(filters: Filters) {
   return "Find your next window";
 }
 
-// The grid. With no filters applied, editorial chapters break it every two rows.
+// The grid. With no filters applied, editorial chapters break it at whole-row boundaries.
 // Remount (via `key`) whenever filters change, which resets paging and the active preview.
 export default function Feed({ videos, filters, onChange, onOpen, onFeedback }: {
   videos: Video[];
@@ -89,13 +91,13 @@ export default function Feed({ videos, filters, onChange, onOpen, onFeedback }: 
           </div></div>
         : <div className="video-grid" onKeyDown={onKeyDown}>
             {clean ? <>
-              {shown.slice(0, 8).map(card)}
+              {shown.slice(0, CHUNK).map(card)}
               <EditorialChapter title="A quieter kind of somewhere" description="Still-camera places for when you want to slow down." action="Find calm places" onAction={() => onChange({ comfort: "still" })}>
                 {calm.map(card)}
               </EditorialChapter>
-              {shown.slice(8, 16).map(card)}
+              {shown.slice(CHUNK, CHUNK * 2).map(card)}
               <PlacesChapter onOpen={onOpen} />
-              {shown.slice(16).map(card)}
+              {shown.slice(CHUNK * 2).map(card)}
               <EditorialChapter title="Look closer" description="High-resolution stereo views where fine detail earns the extra clarity." action="Explore 8K 3D" onAction={() => onChange({ clarity: "8", depth: "3D" })}>
                 {sharp.map(card)}
               </EditorialChapter>

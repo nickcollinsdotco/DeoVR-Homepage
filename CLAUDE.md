@@ -18,7 +18,7 @@ Every VR video is a window to somewhere. The homepage is a **Viewfinder** made l
 - **Never show a blurry frame**: worlds come from self-hosted equirect loops and stills; without one, show the sharp cover. 300p DeoVR previews only play at card size. See `docs/implementation-plan.md` §4.
 - Five directions were prototyped in code and live in `public/directions/` (served at `/directions`). The shipped page is B's stage + C's grid + the D/E spatial layer (design-direction §6, §14). Don't reintroduce A's rails or E's single-shelf layout without updating the design doc.
 - **Every hover affordance has a focus and tap equivalent.** Nothing important is hover-only.
-- **Headset view is a first-class mode** (`<html data-view="headset">`): ≥ 64px targets, ≥ 16px text, max 3 grid columns, bottom dock nav, fades/small scales only, no lateral motion.
+- **Headset view is a first-class mode** (`<html data-view="headset">`): ≥ 64px targets, ≥ 16px text, max 3 grid columns, bottom dock nav (a solid full-width band; the only fixed control layer, so nothing sticky stacks over other targets), fades/small scales only, no lateral motion.
 - Fewer, better: when in doubt, remove a module rather than add one.
 
 ## Engineering rules

@@ -212,7 +212,7 @@ Why not C: kept as the discovery layer, not the lead.
 - Moved into the avatar/Library menu: My Subscriptions, Liked, Watch History, My Playlists, Upload, DriveAI, All Playlists.
 - Removed: the persistent sidebar.
 
-**Bottom dock (headset view)**: Home · Search · Queue · Library · 2D view. Large, labelled, bottom-centre, with a persistent way back to desktop mode.
+**Bottom dock (headset view)**: Home · Search · Queue · Library · 2D view. Large, labelled, bottom-centre, with a persistent way back to desktop mode. It is a solid full-width band and the only fixed control layer in headset view: the discovery bar scrolls with the page, so controls never stack under a controller ray.
 
 ### Homepage, top to bottom
 
