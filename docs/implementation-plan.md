@@ -128,11 +128,19 @@ Covers use `next/image` with `unoptimized` (DeoVR's CDN already serves right-siz
 
 ## 6. Motion
 
-- CSS transitions on `transform` / `opacity`; tokens `--d1 150ms`, `--d2 220ms`, `--d3 420ms`, `--ease cubic-bezier(.2,.7,.2,1)`.
-- Portals fade in on intent (~160ms dwell, 450ms in headset view). Planets unwrap with eased morph.
-- Stage swap is a world crossfade, not a slide. Step inside is a FLIP of the world layer (560ms) with a slight FOV widening.
-- **Reduced motion:** no idle drift, no autoplaying loops (stills instead), instant crossfades and FLIP. Look-around stays available because it is user-driven.
-- **Headset view:** fades and small scales only; no lateral motion.
+Audited against Emil Kowalski's design-engineering rules (`emil-design-eng`, `review-animations`).
+
+- **Tokens:** `--ease: cubic-bezier(0.23, 1, 0.32, 1)` for enter/exit and UI response, `--ease-in-out: cubic-bezier(0.77, 0, 0.175, 1)` for on-screen movement; `--d1 150ms`, `--d2 220ms`, `--d3 420ms` (media crossfades only).
+- **GPU only.** Step inside lays the world out full-viewport and FLIPs it from its slot with `transform` + `clip-path` (480ms in, 320ms out); the canvas keeps one buffer size, so nothing reflows mid-flight.
+- **Asymmetric:** portals open on a ~160ms dwell and fade in deliberately, then close faster; planets unwrap slower than they rewrap; dialogs enter in 220ms and exit in 150ms.
+- **Interruptible:** world crossfades continue from what is on screen when a new alternate arrives mid-fade; pointer look-around follows with damped momentum rather than 1:1.
+- **Origin:** the Immersion popover scales from its trigger (top right); modals stay centred. Entrances start at `scale(.97)` + opacity via `@starting-style`, never from zero.
+- **Press feedback:** `scale(.97)` on buttons, chips, tabs, alternates, planets and dock buttons.
+- **Nothing moves on keyboard navigation:** focus opens a portal as a still, forward view (no auto-sweep).
+- **Hover motion** is gated behind `(hover: hover) and (pointer: fine)`.
+- **Reduced motion:** gentler, not zero. Fades stay; scale, translate, idle drift, autoplaying loops and the Step inside flight are removed.
+- **Headset view:** fades and small scales only; no idle drift (lateral motion causes vection).
+- **Idle cost:** the portal canvas redraws only when something moves (animation, scroll, resize, registry change); the stage stops rendering and pauses its loop when scrolled out of view.
 
 ---
 

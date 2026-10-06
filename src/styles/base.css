@@ -33,5 +33,8 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 .skip-link:focus { transform: none; }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  /* Gentler, not zero: keep opacity and colour fades that aid comprehension, drop movement. */
+  *, *::before, *::after { scroll-behavior: auto !important; animation-iteration-count: 1 !important; }
+  .card-media > img, .alternate-media img, .planet-media, .button, .chip, .feed-tab, .alternate, .card-queue, .headset-dock button, .filter-popover { transform: none !important; }
+  .quickview-dialog, .queue-dialog, .queue-feedback { scale: none !important; translate: none !important; }
 }

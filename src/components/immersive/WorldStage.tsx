@@ -48,11 +48,17 @@ export default function WorldStage({ source, inside, title, watchHref, onExit }:
         return s.still ? stillTexture(s.still, s.full) : null;
       };
       const st = { cur: null as Layer | null, next: null as Layer | null, mix: 0, fade: 0, yaw: 0, pitch: 0, tyaw: 0, tpitch: 0, vyaw: 0, vfov: 1.15, idle: 0, drag: null as null | { x: number; y: number } };
+      // Crossfades are interruptible: a new world arriving mid-fade continues from what is on
+      // screen (the dominant layer stays, the fainter one is swapped) instead of restarting.
       const setSource = (s: Source) => {
         const t = texFor(s);
         if (!t) return;
-        if (!st.cur) st.cur = { s, t };
-        else if (st.cur.s.key !== s.key) { st.next = { s, t }; st.mix = 0; }
+        if (!st.cur) { st.cur = { s, t }; return; }
+        if (st.next?.s.key === s.key || (!st.next && st.cur.s.key === s.key)) return;
+        if (!st.next) { st.next = { s, t }; st.mix = 0; return; }
+        if (st.cur.s.key === s.key) { [st.cur, st.next] = [st.next, st.cur]; st.mix = 1 - st.mix; return; }
+        if (st.mix > 0.5) { st.cur = st.next; st.mix = 1 - st.mix; }
+        st.next = { s, t };
       };
       setSource(sourceRef.current);
 
@@ -76,13 +82,22 @@ export default function WorldStage({ source, inside, title, watchHref, onExit }:
       canvas.addEventListener("pointerup", onUp);
       canvas.addEventListener("pointercancel", onUp);
 
+      // Don't render (or decode the loop) while the stage is scrolled out of view.
+      let visible = true;
+      const io = new IntersectionObserver(([entry]) => {
+        visible = entry.isIntersecting;
+        const el = st.cur && videos.get(st.cur.s.key);
+        if (el) void (visible ? el.play().catch(() => {}) : el.pause());
+      });
+      io.observe(world);
+
       let last = performance.now();
       const frame = (now: number) => {
         raf = requestAnimationFrame(frame);
         const dt = Math.min((now - last) / 1000, 0.05);
         last = now;
         const w = canvas.clientWidth, h = canvas.clientHeight;
-        if (!st.cur || w < 2) return;
+        if (!st.cur || w < 2 || (!visible && !insideRef.current)) return;
         fit(w, h);
         if (st.next && isReady(st.next.t)) {
           st.mix = damp(st.mix, 1, reduced ? 40 : 3.2, dt);
@@ -94,7 +109,9 @@ export default function WorldStage({ source, inside, title, watchHref, onExit }:
         if (isReady(st.cur.t)) st.fade = damp(st.fade, 1, 3, dt);
         if (!st.drag) {
           st.tyaw += st.vyaw * dt; st.vyaw = damp(st.vyaw, 0, 3, dt); st.idle += dt;
-          if (st.idle > 2.5 && !reduced && st.cur.s.full && !insideRef.current) st.tyaw += dt * 0.03;
+          // A slow idle drift says "this is 360°". Never in headset view (lateral motion → vection).
+          const headset = document.documentElement.dataset.view === "headset";
+          if (st.idle > 2.5 && !reduced && !headset && st.cur.s.full && !insideRef.current) st.tyaw += dt * 0.03;
         }
         const L = Math.min(limit(st.cur.s), st.next ? limit(st.next.s) : Infinity);
         st.tyaw = Math.max(-L, Math.min(L, st.tyaw));
@@ -109,7 +126,8 @@ export default function WorldStage({ source, inside, title, watchHref, onExit }:
         u.uFade.value = st.fade; u.uMorph.value = 0; u.uRadius.value = 0; u.uVignette.value = insideRef.current ? 0.15 : 0.3; u.uSize.value.set(w, h);
         renderer.setViewport(0, 0, w, h);
         draw();
-        world.style.setProperty("--world", st.fade.toFixed(3));
+        const fadeShown = st.fade.toFixed(3); // write only on change: the variable restyles the subtree
+        if (world.style.getPropertyValue("--world") !== fadeShown) world.style.setProperty("--world", fadeShown);
         const wedge = wedgeRef.current;
         if (wedge) {
           const deg = (st.yaw * 180) / Math.PI;
@@ -130,6 +148,7 @@ export default function WorldStage({ source, inside, title, watchHref, onExit }:
         },
       };
       cleanup = () => {
+        io.disconnect();
         canvas.removeEventListener("pointerdown", onDown);
         canvas.removeEventListener("pointermove", onMove);
         canvas.removeEventListener("pointerup", onUp);
@@ -144,33 +163,44 @@ export default function WorldStage({ source, inside, title, watchHref, onExit }:
 
   useEffect(() => { sourceRef.current = source; api.current?.setSource(source); }, [source]);
 
-  // Step inside: FLIP the world layer from its slot to the full viewport and back.
+  // Step inside: the world is laid out full-viewport, then FLIPped from its slot with transform +
+  // clip-path only (no layout properties), so the canvas keeps one drawing-buffer size throughout.
   useEffect(() => {
     insideRef.current = inside;
     const world = worldRef.current;
     if (!world) return;
     const slot = world.parentElement!;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const r = slot.getBoundingClientRect();
-    const box = (x: number, y: number, w: number, h: number) => ({ top: `${y}px`, left: `${x}px`, width: `${w}px`, height: `${h}px` });
+    const slotPose = () => {
+      const r = slot.getBoundingClientRect(), W = window.innerWidth, H = window.innerHeight;
+      const s = Math.max(r.width / W, r.height / H);
+      const dx = (W * s - r.width) / 2, dy = (H * s - r.height) / 2;
+      return { transform: `translate(${r.left - dx}px, ${r.top - dy}px) scale(${s})`, clipPath: `inset(${dy / s}px ${dx / s}px round ${8 / s}px)` };
+    };
+    const fullPose = { transform: "none", clipPath: "inset(0px 0px round 0px)" };
+
     if (inside) {
-      Object.assign(world.style, box(r.left, r.top, r.width, r.height));
+      world.classList.remove("is-landing");
       world.classList.add("is-inside");
+      Object.assign(world.style, slotPose());
       document.documentElement.classList.add("world-open");
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        world.classList.add("is-flying");
-        Object.assign(world.style, box(0, 0, window.innerWidth, window.innerHeight), { borderRadius: "0px" });
+      const frame = requestAnimationFrame(() => requestAnimationFrame(() => {
+        if (!reduced) world.classList.add("is-flying");
+        Object.assign(world.style, fullPose);
         backRef.current?.focus({ preventScroll: true });
       }));
       const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onExit(); };
       window.addEventListener("keydown", onKey);
-      return () => window.removeEventListener("keydown", onKey);
+      return () => { cancelAnimationFrame(frame); window.removeEventListener("keydown", onKey); };
     }
+
     if (!world.classList.contains("is-inside")) return;
     document.documentElement.classList.remove("world-open");
-    Object.assign(world.style, box(r.left, r.top, r.width, r.height), { borderRadius: "" });
-    const done = () => { world.classList.remove("is-inside", "is-flying"); world.removeAttribute("style"); };
-    const t = setTimeout(done, reduced ? 0 : 560);
+    world.classList.remove("is-flying");
+    if (!reduced) world.classList.add("is-landing");
+    Object.assign(world.style, slotPose());
+    const done = () => { world.classList.remove("is-inside", "is-landing"); world.removeAttribute("style"); };
+    const t = setTimeout(done, reduced ? 0 : 320);
     return () => clearTimeout(t);
   }, [inside, onExit]);
 

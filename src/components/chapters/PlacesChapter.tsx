@@ -44,9 +44,9 @@ function PlanetCard({ place, country, video, onOpen }: Place & { onOpen: (video:
   }, [key, still]);
   useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
 
-  const enter = (auto: boolean) => {
+  const enter = () => {
     if (timer.current) clearTimeout(timer.current);
-    timer.current = setTimeout(() => setPortalActive(key, true, auto), view === "headset" ? 400 : 120);
+    timer.current = setTimeout(() => setPortalActive(key, true), view === "headset" ? 400 : 120);
   };
   const leave = () => {
     if (timer.current) clearTimeout(timer.current);
@@ -60,10 +60,10 @@ function PlanetCard({ place, country, video, onOpen }: Place & { onOpen: (video:
         type="button"
         className="planet-media"
         aria-label={`${place}, ${country}: 360-degree place. Open quick view.`}
-        onPointerEnter={() => enter(false)}
+        onPointerEnter={enter}
         onPointerLeave={leave}
         onPointerMove={(event) => pointerToPortal(key, event)}
-        onFocus={() => enter(true)}
+        onFocus={enter}
         onBlur={leave}
         onClick={() => onOpen(video)}
       >

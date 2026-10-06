@@ -9,8 +9,10 @@
 .card-media { position: relative; overflow: hidden; aspect-ratio: 5 / 3; border-radius: var(--radius); background: var(--surface-1); isolation: isolate; }
 .card-media img, .card-media video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .card-media img { transition: transform var(--d2) var(--ease), filter var(--d2) var(--ease); }
-.video-card:hover .card-media img { filter: brightness(1.04); }
-.video-card:hover .card-media > img { transform: scale(1.015); }
+@media (hover: hover) and (pointer: fine) {
+  .video-card:hover .card-media img { filter: brightness(1.04); }
+  .video-card:hover .card-media > img { transform: scale(1.015); }
+}
 .card-media video { z-index: 1; opacity: 0; transition: opacity var(--d3) var(--ease); }
 .card-media video.is-playing { opacity: 1; }
 .card-open-media { position: absolute; z-index: 2; inset: 0; display: block; width: 100%; height: 100%; padding: 0; border: 0; background: transparent; text-align: left; cursor: pointer; }
@@ -18,7 +20,8 @@
 .premium-badge { position: absolute; z-index: 3; top: .45rem; left: .45rem; display: inline-flex; align-items: center; gap: .25rem; padding: .22rem .42rem; border-radius: 3px; background: oklch(0.12 0.005 60 / .8); color: var(--text); font-size: .65rem; font-weight: 600; }
 .premium-badge svg { width: .75rem; height: .75rem; color: var(--accent); }
 .duration-badge, .premium-badge { pointer-events: none; }
-.card-queue { position: absolute; z-index: 4; top: .45rem; right: .45rem; display: grid; width: 2.5rem; height: 2.5rem; place-items: center; padding: 0; border: 1px solid #ffffff30; border-radius: 50%; background: oklch(0.12 0.005 60 / .76); color: var(--text); opacity: 0; transition: opacity var(--d1), background var(--d1), color var(--d1); cursor: pointer; }
+.card-queue { position: absolute; z-index: 4; top: .45rem; right: .45rem; display: grid; width: 2.5rem; height: 2.5rem; place-items: center; padding: 0; border: 1px solid #ffffff30; border-radius: 50%; background: oklch(0.12 0.005 60 / .76); color: var(--text); opacity: 0; transition: opacity var(--d1), background var(--d1), color var(--d1), transform var(--d1) var(--ease); cursor: pointer; }
+.card-queue:active { transform: scale(.94); }
 .card-queue svg { width: 1.15rem; height: 1.15rem; }
 .video-card:hover .card-queue, .video-card:focus-within .card-queue, .card-queue[aria-pressed="true"] { opacity: 1; }
 .card-queue[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }

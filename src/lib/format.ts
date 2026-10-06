@@ -1,22 +1,39 @@
 // Display formatting for catalogue values.
 
-const EMOJI = /[\p{Extended_Pictographic}\u{1F1E6}-\u{1F1FF}️‍]/gu;
-const SPEC_TOKENS = /\b(VR\s?180|180°?|360°?|3D|2D|8K|7K|6K|5K|4K|60\s?FPS|HDR|VR)\b/gi;
+const EMOJI = /[\p{Extended_Pictographic}\p{Regional_Indicator}\p{Variation_Selector}\p{Join_Control}]/gu;
+
+// One format token: 360°, VR180, 3D180, 8K, 60FPS, HDR… (trailing degree sign optional).
+const SPEC = String.raw`(?:VR\s?(?:180|360)|3D\s?180|180|190|360|3D|2D|\d{1,2}K|\d{2,3}\s?FPS|HDR|UHD|VR)°?`;
+const EDGE = String.raw`(?![\p{L}\p{N}])`;
+/** Two or more specs in a row ("in 360° VR 8K"), with an optional leading "in"/"at". */
+const SPEC_RUN = new RegExp(String.raw`(?:\s+(?:in|at)(?=\s))?\s*(?<![\p{L}\p{N}])${SPEC}(?:[\s·/,+-]*${SPEC})+${EDGE}`, "giu");
+/** Brackets that hold nothing but specs: "(8K 3D VR180 Video)", "【180° VR】". */
+const SPEC_GROUP = new RegExp(String.raw`[\[(（【]\s*(?:${SPEC}|video|[\s·/,|+-])*[\])）】]`, "giu");
+const SPEC_START = new RegExp(String.raw`^\s*${SPEC}${EDGE}`, "iu");
+/** A single trailing spec, unless it is the object of "of" ("The Power of VR"). */
+const SPEC_END = new RegExp(String.raw`(?:\s+(?:in|at))?(?<!\bof)\s+${SPEC}\s*$`, "iu");
 
 /**
  * Creators put format specs, emoji and series tags in titles because the UI never showed them.
- * The Immersion Signature shows specs now, so titles can be about the place.
+ * The Immersion Signature shows specs now, so titles can be about the place. Runs of specs go
+ * anywhere; a single spec only at the edges, so "Urban Pulse in 360° Immersion" keeps its meaning.
  */
 export function cleanTitle(title: string) {
-  return title
+  let text = title
     .replace(EMOJI, " ")
-    .replace(/\[[^\]]*\]/g, " ")
-    .replace(SPEC_TOKENS, " ")
-    .split(/\s[|｜]\s|\s[-–]\s(?=[A-Z0-9 ]+$)/)[0]
-    .replace(/[\s,|｜·•-]+$/g, "")
-    .replace(/^[\s,|｜·•-]+/, "")
+    .replace(/°(?=\p{L})/gu, "° ")
+    .replace(SPEC_GROUP, " ")
+    .replace(SPEC_RUN, " ")
+    .split(/\s[|｜]\s/)[0];
+  for (let pass = 0; pass < 2; pass++) text = text.replace(SPEC_START, "").replace(SPEC_END, "");
+  const cleaned = text
+    .replace(/[\s/·,]+(?=[\])）】])/g, "")
+    .replace(/\s+([,.:!?])/g, "$1")
+    .replace(/^[\s,|｜·•:–—-]+|[\s,|｜·•:–—-]+$/g, "")
+    .replace(/\s+(?:in|at)$/i, "")
     .replace(/\s{2,}/g, " ")
-    .trim() || title;
+    .trim();
+  return cleaned.length >= 3 ? cleaned : title;
 }
 
 export function formatDuration(seconds: number) {

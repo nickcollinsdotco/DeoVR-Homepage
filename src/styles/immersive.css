@@ -4,7 +4,7 @@
 .portal-canvas { position: fixed; inset: 0; z-index: 0; width: 100vw; height: 100vh; pointer-events: none; }
 main, .site-footer { position: relative; z-index: 1; }
 .card-media[data-portal] { background: transparent; }
-.card-media > img { opacity: calc(1 - var(--portal, 0)); transition: transform 650ms var(--ease); }
+.card-media > img { opacity: calc(1 - var(--portal, 0)); }
 .look-hint { position: absolute; z-index: 3; left: .55rem; bottom: .55rem; padding: .3rem .5rem; border-radius: 4px; background: oklch(0.155 0.006 60 / .82); color: var(--text-2); font-size: .72rem; font-weight: 500; pointer-events: none; opacity: 0; transition: opacity var(--d2) var(--ease); }
 .card-media[data-portal] .look-hint { opacity: 1; transition-delay: 250ms; }
 .card-media[data-portal] .premium-badge, .card-media[data-portal] .card-queue { opacity: 0; }
@@ -20,11 +20,13 @@ main, .site-footer { position: relative; z-index: 1; }
 .world-wedge { transition: none; }
 .stage-media .stage-scrim, .stage-media .stage-index, .stage-media .stage-media-foot { pointer-events: none; }
 .stage-media .stage-index, .stage-media .stage-media-foot, .stage-media .stage-scrim { z-index: 2; }
-.world.is-inside { position: fixed; z-index: 200; border-radius: var(--radius); }
-.world.is-flying { transition: top 560ms var(--ease), left 560ms var(--ease), width 560ms var(--ease), height 560ms var(--ease), border-radius 560ms var(--ease); }
+/* Step inside: the world is laid out full-viewport, then FLIPped with transform + clip-path (GPU only). */
+.world.is-inside { position: fixed; inset: 0; z-index: 200; border-radius: 0; transform-origin: 0 0; }
+.world.is-flying { transition: transform 480ms var(--ease-in-out), clip-path 480ms var(--ease-in-out); }
+.world.is-landing { transition: transform 320ms var(--ease), clip-path 320ms var(--ease); }
 .world.is-inside .world-compass { top: 1.25rem; right: 1.25rem; }
 html.world-open { overflow: hidden; }
-.world-inside-ui { position: absolute; z-index: 4; left: 0; right: 0; bottom: 0; display: grid; justify-items: center; gap: 1rem; padding: 4rem 1.5rem 2rem; background: linear-gradient(0deg, oklch(0.155 0.006 60 / .7), transparent); animation: world-ui-in 400ms var(--ease) 350ms both; }
+.world-inside-ui { position: absolute; z-index: 4; left: 0; right: 0; bottom: 0; display: grid; justify-items: center; gap: 1rem; padding: 4rem 1.5rem 2rem; background: linear-gradient(0deg, oklch(0.155 0.006 60 / .7), transparent); animation: world-ui-in 260ms var(--ease) 380ms both; }
 .world-inside-title { margin: 0; font-family: var(--font-archivo), var(--font-inter), sans-serif; font-size: clamp(1.5rem, 2.4vw, 2.2rem); font-weight: 700; font-stretch: 86%; letter-spacing: -.03em; }
 .world-inside-actions { display: flex; gap: .6rem; }
 .world-inside-actions kbd { font: inherit; font-size: .72rem; opacity: .6; }
@@ -38,13 +40,15 @@ html.world-open { overflow: hidden; }
 .planet-media { position: relative; display: block; width: 100%; aspect-ratio: 1; padding: 0; border: 0; border-radius: var(--radius); background: var(--surface-1); overflow: hidden; cursor: pointer; transition: transform var(--d2) var(--ease); }
 .planet-media[data-portal] { background: transparent; }
 .planet-media > img { object-fit: cover; opacity: calc(1 - var(--portal, 0)); }
-.planet-media:hover, .planet-media:focus-visible { transform: scale(1.02); }
+@media (hover: hover) and (pointer: fine) { .planet-media:hover { transform: scale(1.02); } }
+.planet-media:focus-visible { transform: scale(1.02); }
+.planet-media:active { transform: scale(.97); }
 .planet-place { margin: .8rem 0 .15rem; font-family: var(--font-archivo), var(--font-inter), sans-serif; font-size: 1.3rem; font-weight: 700; font-stretch: 86%; letter-spacing: -.025em; line-height: 1.05; }
 .planet-meta { display: flex; gap: .35rem; margin: 0; color: var(--text-3); font-size: .78rem; }
 @media (max-width: 1119px) { .places-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 639px) { .places-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 html[data-view="headset"] .places-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5rem; }
-@media (prefers-reduced-motion: reduce) { .world.is-flying { transition: none; } .world-inside-ui { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .world.is-flying, .world.is-landing { transition: opacity 200ms var(--ease); } .world-inside-ui { animation-duration: 150ms; animation-delay: 0ms; } }
 html.world-open main { z-index: 70; }
 html.world-open .stage-media { isolation: auto; overflow: visible; z-index: 100; }
 .quickview-media .world-compass { right: auto; left: .9rem; }

@@ -37,6 +37,7 @@ html[data-view="headset"] body { padding-bottom: 7.5rem; }
 html[data-view="headset"] .headset-dock { position: fixed; z-index: 55; right: 0; bottom: 0; left: 0; display: flex; align-items: center; justify-content: center; gap: .5rem; padding: .75rem var(--gutter) calc(.75rem + env(safe-area-inset-bottom)); border-top: 1px solid var(--line-strong); background: var(--bg); }
 html[data-view="headset"] .queue-feedback { bottom: 7rem; }
 html[data-view="headset"] .headset-dock button { display: inline-flex; min-width: 5rem; min-height: var(--target); align-items: center; justify-content: center; gap: .45rem; padding: 0 .85rem; border: 0; border-radius: 999px; background: transparent; color: var(--text-2); font-size: .8rem; font-weight: 600; white-space: nowrap; cursor: pointer; }
+html[data-view="headset"] .headset-dock button:active { transform: scale(.97); }
 html[data-view="headset"] .headset-dock button[aria-current="true"] { background: var(--text); color: var(--bg); }
 html[data-view="headset"] .headset-dock svg { width: 1.25rem; height: 1.25rem; flex: none; }
 html[data-view="headset"] .headset-dock .queue-count { min-width: 1.3rem; height: 1.3rem; }

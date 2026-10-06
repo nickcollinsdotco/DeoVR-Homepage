@@ -42,10 +42,10 @@ export default function VideoCard({
 
   // Immersive videos open a look-around window (a still, user-driven, so it also runs under reduced
   // motion); flat or premium ones fall back to DeoVR's muted 14-second preview clip.
-  const startDwell = (fromFocus = false) => {
+  const startDwell = () => {
     if (dwellTimer.current) clearTimeout(dwellTimer.current);
     if (still) {
-      dwellTimer.current = setTimeout(() => setPortalActive(portalKey, true, fromFocus), view === "headset" ? 450 : 160);
+      dwellTimer.current = setTimeout(() => setPortalActive(portalKey, true), view === "headset" ? 450 : 160);
       return;
     }
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -60,7 +60,7 @@ export default function VideoCard({
   };
 
   return (
-    <article className="video-card" onPointerEnter={() => startDwell()} onPointerLeave={stopDwell} onFocusCapture={() => startDwell(true)} onBlurCapture={(event) => {
+    <article className="video-card" onPointerEnter={startDwell} onPointerLeave={stopDwell} onFocusCapture={startDwell} onBlurCapture={(event) => {
       if (!event.currentTarget.contains(event.relatedTarget as Node | null)) stopDwell();
     }}>
       <div className="card-media" data-preview-host ref={mediaRef} onPointerMove={still ? (event) => pointerToPortal(portalKey, event) : undefined}>
