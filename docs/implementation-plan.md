@@ -173,7 +173,8 @@ Each phase: run the app, screenshot desktop 1440 / mobile 390 / headset view, na
 | Immersive layer: world stage, portals, planets, Step inside, quick view world, WebXR | ✅ (WebXR not yet tested on a headset) |
 | Curation pass: place-first For you, place-led chapters | ✅ |
 | Restructure into the folder layout above; lint clean | ✅ |
-| Deploy to Vercel; Quest Browser check | Pending |
+| Deploy to Vercel ([deo-vr-homepage.vercel.app](https://deo-vr-homepage.vercel.app)) | ✅ |
+| Quest Browser check (Enter VR on device) | Pending |
 | Bundle trim toward 120KB | Not started |
 
 ### Definition of done

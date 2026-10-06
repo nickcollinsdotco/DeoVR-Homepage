@@ -2,6 +2,8 @@
 
 A redesign of the [deovr.com](https://deovr.com) homepage as a dark, VR-aware discovery experience, built for the DeoVR / SLR design challenge.
 
+**Live:** [deo-vr-homepage.vercel.app](https://deo-vr-homepage.vercel.app) · [headset view](https://deo-vr-homepage.vercel.app/?view=headset) · [directions explored](https://deo-vr-homepage.vercel.app/directions)
+
 **Every VR video is a window to somewhere.** The homepage lets you look through it before you step in, and tells you what it will feel like: field of view, depth, clarity, comfort and length.
 
 ## What's in it
