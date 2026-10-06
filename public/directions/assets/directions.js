@@ -224,11 +224,11 @@
     t.setAttribute('aria-label', 'Exploration switcher');
     const q = `?view=${view}`;
     t.innerHTML = `
-      <a href="a-marquee.html${q}" ${current === 'a' ? 'aria-current="true"' : ''} title="A — Marquee">A</a>
-      <a href="b-viewfinder.html${q}" ${current === 'b' ? 'aria-current="true"' : ''} title="B — Viewfinder">B</a>
-      <a href="c-field-guide.html${q}" ${current === 'c' ? 'aria-current="true"' : ''} title="C — Field Guide">C</a>
-      <a href="d-portals.html" title="D — Portals">D</a>
-      <a href="e-inside-out.html" title="E — Inside-out">E</a>
+      <a href="a-marquee.html${q}" ${current === 'a' ? 'aria-current="true"' : ''} title="A · Marquee">A</a>
+      <a href="b-viewfinder.html${q}" ${current === 'b' ? 'aria-current="true"' : ''} title="B · Viewfinder">B</a>
+      <a href="c-field-guide.html${q}" ${current === 'c' ? 'aria-current="true"' : ''} title="C · Field Guide">C</a>
+      <a href="d-portals.html" title="D · Portals">D</a>
+      <a href="e-inside-out.html" title="E · Inside-out">E</a>
       <a href="./" title="All directions">↩</a>
       <hr>
       <button data-v="desktop" ${view === 'desktop' ? 'aria-current="true"' : ''} title="Desktop view">PC</button>

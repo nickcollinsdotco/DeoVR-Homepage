@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>C · Field Guide — DeoVR exploration</title>
+<title>C · Field Guide · DeoVR directions</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/directions.css">
@@ -347,7 +347,7 @@ function render() {
       calm.slice(0, 4).forEach((x) => shown.add(x.slug));
     }
     if (!filtered && i === 20) {
-      html += chapter('All the way around', fovGlyph(360), 'Full 360° — turn your head, or your chair, and the world keeps going.', videos.filter((x) => x.fov === 360 && !shown.has(x.slug)).sort((a, b) => b.views - a.views));
+      html += chapter('All the way around', fovGlyph(360), 'Full 360°: turn your head, or your chair, and the world keeps going.', videos.filter((x) => x.fov === 360 && !shown.has(x.slug)).sort((a, b) => b.views - a.views));
     }
     if (!shown.has(v.slug)) html += card(v);
   });
