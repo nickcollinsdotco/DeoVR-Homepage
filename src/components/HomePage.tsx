@@ -22,7 +22,7 @@ const bySlug = (slug: string | null) => (slug ? VIDEOS.find((video) => video.slu
 // Page-level state: filters and quick view mirror the URL (?feed, ?intent, ?fov…, ?v=slug);
 // the queue and view mode live in AppProviders.
 export default function HomePage() {
-  const { view } = useAppState();
+  const { view, addMany } = useAppState();
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [ready, setReady] = useState(false);
   const [stageVideo, setStageVideo] = useState<Video>(() => getFeaturedVideos()[0] ?? VIDEOS[0]);
@@ -60,12 +60,11 @@ export default function HomePage() {
 
   useEffect(() => () => { if (toastTimer.current) clearTimeout(toastTimer.current); }, []);
 
+  // The URL is the source of truth, so read it rather than writing history inside a state updater.
   const changeFilters = useCallback((patch: Partial<Filters>, history: "push" | "replace" = "push") => {
-    setFilters((current) => {
-      const next = { ...current, ...patch };
-      writeFiltersToUrl(next, history);
-      return next;
-    });
+    const next = { ...filtersFromSearch(window.location.search), ...patch };
+    writeFiltersToUrl(next, history);
+    setFilters(next);
   }, []);
 
   const announce = useCallback((message: string) => {
@@ -73,6 +72,21 @@ export default function HomePage() {
     if (toastTimer.current) clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setToast(""), 3000);
   }, []);
+
+  // Headset handoff: a queue link from another device (?queue=slug,slug) lands in this queue.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (!url.searchParams.has("queue")) return;
+    const handed = (url.searchParams.get("queue") ?? "").split(",").filter((slug) => bySlug(slug));
+    url.searchParams.delete("queue");
+    window.history.replaceState({}, "", url);
+    if (!handed.length) return;
+    addMany(handed);
+    // URL state is only readable after mount (static prerender).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setQueueOpen(true);
+    announce(`${handed.length} ${handed.length === 1 ? "video" : "videos"} arrived from your queue link.`);
+  }, [addMany, announce]);
 
   const openQuickView = useCallback((video: Video) => {
     setQuickVideo(video);
@@ -100,7 +114,7 @@ export default function HomePage() {
       <TopBar query={filters.query} onQuery={(query) => changeFilters({ query }, "replace")} searchRef={searchRef} onOpenQueue={() => setQueueOpen(true)} />
       <main id="top">
         <Stage selected={stageVideo} onSelect={setStageVideo} onOpen={openQuickView} onFeedback={announce} />
-        <DiscoveryBar filters={filters} resultCount={matching.length} ready={ready} onChange={changeFilters} headsetSearchRef={headsetSearchRef} />
+        <DiscoveryBar filters={filters} resultCount={matching.length} ready={ready} onChange={changeFilters} onFeedback={announce} headsetSearchRef={headsetSearchRef} />
         <Feed key={JSON.stringify(filters)} videos={matching} filters={filters} onChange={changeFilters} onOpen={openQuickView} onFeedback={announce} />
         <CreatorsRow />
       </main>

@@ -5,16 +5,20 @@ import type { Texture } from "three";
 import { Icon } from "@/components/ui/Icons";
 
 type Source = { key: string; full: boolean; still?: string; loop?: string };
+type OrientationPermission = { requestPermission?: () => Promise<string> };
 
 // The stage's living media: a real 360°/180° world you can drag to look around. Switching
 // featured items crossfades the world itself. "Step inside" FLIPs the world to the full viewport.
+// On phones, "Tilt to look" turns the device into a window onto the world (device orientation).
 export default function WorldStage({ source, inside, title, watchHref, onExit }: { source: Source; inside: boolean; title: string; watchHref: string; onExit: () => void }) {
   const worldRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wedgeRef = useRef<SVGPathElement>(null);
   const backRef = useRef<HTMLButtonElement>(null);
-  const api = useRef<{ setSource: (s: Source) => void; nudge: (dyaw: number, dpitch: number) => void; enterVR: () => Promise<void> } | null>(null);
+  const api = useRef<{ setSource: (s: Source) => void; nudge: (dyaw: number, dpitch: number) => void; tilt: (on: boolean) => void; enterVR: () => Promise<void> } | null>(null);
   const [vr, setVr] = useState(false);
+  const [tiltable, setTiltable] = useState(false);
+  const [tilt, setTilt] = useState(false);
   const sourceRef = useRef(source);
   const insideRef = useRef(inside);
 
@@ -31,6 +35,8 @@ export default function WorldStage({ source, inside, title, watchHref, onExit }:
       if (stopped) return;
       let view: ReturnType<typeof createView>;
       try { view = createView(canvas, { alpha: false }); } catch { return; }
+      // Touch devices with a motion sensor; never in headset view (the headset already is the window).
+      setTiltable(typeof DeviceOrientationEvent !== "undefined" && window.matchMedia("(pointer: coarse)").matches && document.documentElement.dataset.view !== "headset");
       const { renderer, u, fit, draw } = view;
       const videos = new Map<string, HTMLVideoElement>();
 
@@ -47,7 +53,7 @@ export default function WorldStage({ source, inside, title, watchHref, onExit }:
         }
         return s.still ? stillTexture(s.still, s.full) : null;
       };
-      const st = { cur: null as Layer | null, next: null as Layer | null, mix: 0, fade: 0, yaw: 0, pitch: 0, tyaw: 0, tpitch: 0, vyaw: 0, vfov: 1.15, idle: 0, drag: null as null | { x: number; y: number } };
+      const st = { cur: null as Layer | null, next: null as Layer | null, mix: 0, fade: 0, yaw: 0, pitch: 0, tyaw: 0, tpitch: 0, vyaw: 0, vfov: 1.15, idle: 0, drag: null as null | { x: number; y: number }, tilt: false };
       // Crossfades are interruptible: a new world arriving mid-fade continues from what is on
       // screen (the dominant layer stays, the fainter one is swapped) instead of restarting.
       const setSource = (s: Source) => {
@@ -81,6 +87,32 @@ export default function WorldStage({ source, inside, title, watchHref, onExit }:
       canvas.addEventListener("pointermove", onMove);
       canvas.addEventListener("pointerup", onUp);
       canvas.addEventListener("pointercancel", onUp);
+
+      // Tilt: where the phone's back camera points (W3C device frame: x east, y north, z up), applied
+      // as deltas, so it composes with dragging and the view doesn't jump to the phone's heading.
+      let aim: { yaw: number; pitch: number } | null = null;
+      let heard: ReturnType<typeof setTimeout> | undefined;
+      const onOrient = (e: DeviceOrientationEvent) => {
+        if (e.alpha == null || e.beta == null || e.gamma == null) return;
+        clearTimeout(heard);
+        const r = Math.PI / 180, ca = Math.cos(e.alpha * r), sa = Math.sin(e.alpha * r), cb = Math.cos(e.beta * r), sb = Math.sin(e.beta * r), cg = Math.cos(e.gamma * r), sg = Math.sin(e.gamma * r);
+        const fx = -ca * sg - sa * sb * cg, fy = -sa * sg + ca * sb * cg, fz = -cb * cg;
+        if (Math.abs(fz) > 0.97) { aim = null; return; } // pointing straight up/down: heading is undefined
+        const next = { yaw: Math.atan2(fx, fy), pitch: Math.asin(fz) };
+        if (aim) {
+          const d = next.yaw - aim.yaw;
+          st.tyaw += d - 2 * Math.PI * Math.round(d / (2 * Math.PI));
+          st.tpitch += next.pitch - aim.pitch;
+        }
+        aim = next; st.vyaw = 0; st.idle = 0;
+      };
+      const tilt = (on: boolean) => {
+        st.tilt = on; aim = null; clearTimeout(heard);
+        window.removeEventListener("deviceorientation", onOrient);
+        if (!on) return;
+        window.addEventListener("deviceorientation", onOrient);
+        heard = setTimeout(() => { tilt(false); if (!stopped) setTilt(false); }, 1500); // no sensor after all
+      };
 
       // Don't render (or decode the loop) while the stage is scrolled out of view.
       let visible = true;
@@ -116,8 +148,9 @@ export default function WorldStage({ source, inside, title, watchHref, onExit }:
         const L = Math.min(limit(st.cur.s), st.next ? limit(st.next.s) : Infinity);
         st.tyaw = Math.max(-L, Math.min(L, st.tyaw));
         st.tpitch = Math.max(-0.85, Math.min(0.85, st.tpitch));
-        st.yaw = damp(st.yaw, st.tyaw, 9, dt);
-        st.pitch = damp(st.pitch, st.tpitch, 9, dt);
+        const follow = st.tilt ? 22 : 9; // tilt tracks the hand closely; drag keeps its momentum feel
+        st.yaw = damp(st.yaw, st.tyaw, follow, dt);
+        st.pitch = damp(st.pitch, st.tpitch, follow, dt);
         const wide = insideRef.current ? (st.cur.s.full ? 1.55 : 1.3) : 1.15;
         st.vfov = damp(st.vfov, wide, 4, dt);
         u.uMapA.value = st.cur.t; u.uHalfA.value = st.cur.s.full ? 0 : 1;
@@ -139,6 +172,7 @@ export default function WorldStage({ source, inside, title, watchHref, onExit }:
       api.current = {
         setSource,
         nudge: (dy, dp) => { st.tyaw += dy; st.tpitch += dp; st.idle = 0; },
+        tilt,
         enterVR: async () => {
           const layer = st.next ?? st.cur;
           if (!layer) return;
@@ -149,6 +183,7 @@ export default function WorldStage({ source, inside, title, watchHref, onExit }:
       };
       cleanup = () => {
         io.disconnect();
+        tilt(false);
         canvas.removeEventListener("pointerdown", onDown);
         canvas.removeEventListener("pointermove", onMove);
         canvas.removeEventListener("pointerup", onUp);
@@ -204,6 +239,16 @@ export default function WorldStage({ source, inside, title, watchHref, onExit }:
     return () => clearTimeout(t);
   }, [inside, onExit]);
 
+  // iOS asks for motion access, and only from inside the tap itself (no awaits before the request).
+  const toggleTilt = () => {
+    if (tilt) { api.current?.tilt(false); setTilt(false); return; }
+    const DOE = DeviceOrientationEvent as unknown as OrientationPermission;
+    void (DOE.requestPermission ? DOE.requestPermission() : Promise.resolve("granted")).then((answer) => {
+      if (answer === "denied") return; // anything else: listen, and fall back if no readings arrive
+      api.current?.tilt(true); setTilt(true);
+    }).catch(() => {});
+  };
+
   const onKeyDown = (e: React.KeyboardEvent) => {
     const step = 0.18;
     const map: Record<string, [number, number]> = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, step], ArrowDown: [0, -step] };
@@ -215,16 +260,16 @@ export default function WorldStage({ source, inside, title, watchHref, onExit }:
   return (
     <div className="world" ref={worldRef}>
       <canvas ref={canvasRef} className="world-canvas" tabIndex={0} aria-label={`${source.full ? "360" : "180"}-degree view of ${title}. Drag or use arrow keys to look around.`} onKeyDown={onKeyDown} />
-      <div className="world-compass" aria-hidden="true">
-        <svg viewBox="0 0 44 44" width="40" height="40">
+      <Compass as={tiltable ? "button" : "div"} tilt={tilt} onClick={tiltable ? toggleTilt : undefined}>
+        <svg viewBox="0 0 44 44" width="40" height="40" aria-hidden="true">
           {source.full
             ? <circle cx="22" cy="22" r="19" fill="none" stroke="currentColor" strokeWidth="2" />
             : <><path d="M3 26a19 19 0 0 1 38 0" fill="none" stroke="currentColor" strokeWidth="2" /><path d="M2 26h40" stroke="currentColor" strokeWidth="2" opacity=".35" /></>}
           <path ref={wedgeRef} className="world-wedge" style={{ transformOrigin: source.full ? "22px 22px" : "22px 26px" }} d={source.full ? "M22 22L12.5 5.5A19 19 0 0 1 31.5 5.5Z" : "M22 26L12.5 9.5A19 19 0 0 1 31.5 9.5Z"} fill="currentColor" opacity=".5" />
           <circle cx="22" cy={source.full ? 22 : 26} r="2.5" fill="currentColor" />
         </svg>
-        <span>{source.full ? "360°" : "180°"} · drag to look</span>
-      </div>
+        <span>{source.full ? "360°" : "180°"} · {tiltable ? (tilt ? "tilting" : "tilt to look") : "drag to look"}</span>
+      </Compass>
       {inside && <div className="world-inside-ui">
         <p className="world-inside-title">{title}</p>
         <div className="world-inside-actions">
@@ -235,4 +280,10 @@ export default function WorldStage({ source, inside, title, watchHref, onExit }:
       </div>}
     </div>
   );
+}
+
+// The heading compass; on phones it doubles as the tilt toggle.
+function Compass({ as, tilt, onClick, children }: { as: "div" | "button"; tilt: boolean; onClick?: () => void; children: React.ReactNode }) {
+  if (as === "div") return <div className="world-compass" aria-hidden="true">{children}</div>;
+  return <button type="button" className="world-compass is-tilt" aria-pressed={tilt} aria-label="Tilt your phone to look around" onClick={onClick}>{children}</button>;
 }

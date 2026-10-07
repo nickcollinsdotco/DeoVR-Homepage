@@ -1,6 +1,6 @@
 import type { ReactNode, SVGProps } from "react";
 
-type IconName = "search" | "queue" | "headset" | "library" | "home" | "close" | "play" | "plus" | "check" | "sliders" | "arrow" | "external" | "clock" | "heart" | "more" | "globe" | "layers" | "spark" | "menu" | "bookmark" | "chevron" | "warning";
+type IconName = "search" | "queue" | "headset" | "library" | "home" | "close" | "play" | "plus" | "check" | "sliders" | "arrow" | "external" | "clock" | "heart" | "more" | "globe" | "layers" | "spark" | "menu" | "bookmark" | "chevron" | "warning" | "link";
 
 const paths: Record<IconName, ReactNode> = {
   search: <><circle cx="10.8" cy="10.8" r="6.6" /><path d="m16 16 4.2 4.2" /></>,
@@ -22,6 +22,7 @@ const paths: Record<IconName, ReactNode> = {
   layers: <><path d="m12 3 9 5-9 5-9-5 9-5Z" /><path d="m3 12 9 5 9-5M3 16l9 5 9-5" /></>,
   spark: <><path d="m12 3 1.4 5.6L19 10l-5.6 1.4L12 17l-1.4-5.6L5 10l5.6-1.4L12 3Z" /><path d="m19 16 .7 2.3L22 19l-2.3.7L19 22l-.7-2.3L16 19l2.3-.7L19 16Z" /></>,
   menu: <><path d="M4 6h16M4 12h16M4 18h16" /></>,
+  link: <><path d="M10 14a4 4 0 0 0 5.7 0l3.5-3.5a4 4 0 0 0-5.7-5.7L12 6.3" /><path d="M14 10a4 4 0 0 0-5.7 0l-3.5 3.5a4 4 0 0 0 5.7 5.7l1.5-1.5" /></>,
   bookmark: <path d="M6 4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V21l-6-4-6 4V4.5Z" />,
   chevron: <path d="m9 18 6-6-6-6" />,
   warning: <><path d="M12 3 2.8 19h18.4L12 3Z" /><path d="M12 9v4m0 3h.01" /></>,

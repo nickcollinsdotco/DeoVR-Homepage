@@ -8,10 +8,10 @@ A redesign of the [deovr.com](https://deovr.com) homepage as a dark, VR-aware di
 
 ## What's in it
 
-- **A world, not a hero banner.** The featured stage is a real 360°/180° scene you can drag to look around. Pointing at an alternate crossfades the world itself. *Step inside* takes it full screen; *Enter VR* (WebXR, e.g. Quest Browser) wraps it around you.
+- **A world, not a hero banner.** The featured stage is a real 360°/180° scene you can drag to look around. Pointing at an alternate crossfades the world itself. *Step inside* takes it full screen; *Enter VR* (WebXR, e.g. Quest Browser) wraps it around you. On a phone, tap the compass and *tilt to look*.
 - **Portal cards.** Hover, focus or dwell on an immersive card and it becomes a window you can look around in, without baked-in thumbnail text.
 - **Where in the world.** 360° places drawn as little planets; the shape is the field of view. Point at one to unwrap it.
-- **The Immersion Signature** on every card (field of view · depth · clarity · comfort estimate · length), a pre-flight quick view, URL-driven filters that separate *where* from *how it feels*, a headset queue, and a first-class **headset view** (`?view=headset`).
+- **The Immersion Signature** on every card (field of view · depth · clarity · comfort estimate · length), a pre-flight quick view, URL-driven filters that separate *where* from *how it feels*, a **New to VR?** shortcut (still camera, 180°, under 10 minutes), a headset queue you can send to your headset by link, and a first-class **headset view** (`?view=headset`).
 - **Directions explored** at [`/directions`](public/directions/): the five coded explorations behind the final design, previewable with limited functionality.
 
 All media is real DeoVR content. Equirect stills and stage loops are extracted from DeoVR's own source files by `scripts/media.mjs` and self-hosted.

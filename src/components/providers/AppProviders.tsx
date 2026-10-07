@@ -6,6 +6,7 @@ type QueueContextValue = {
   queue: string[];
   contains: (slug: string) => boolean;
   toggle: (slug: string) => void;
+  addMany: (slugs: string[]) => void;
   remove: (slug: string) => void;
   clear: () => void;
   view: "desktop" | "headset";
@@ -24,9 +25,10 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
       const saved = window.localStorage.getItem("deovr-headset-queue");
       if (saved) {
         const parsed: unknown = JSON.parse(saved);
-        // Hydrate from localStorage after mount (static prerender has no storage).
+        // Hydrate from localStorage after mount (static prerender has no storage). Merged, not
+        // replaced: a queue handed over by link (?queue=) may already have been added.
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        if (Array.isArray(parsed)) setQueue(parsed.filter((item): item is string => typeof item === "string"));
+        if (Array.isArray(parsed)) setQueue((items) => [...new Set([...parsed.filter((item): item is string => typeof item === "string"), ...items])]);
       }
     } catch {
       // Keep an empty in-memory queue when saved data cannot be read.
@@ -72,6 +74,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
     queue,
     contains: (slug) => queue.includes(slug),
     toggle: (slug) => setQueue((items) => items.includes(slug) ? items.filter((item) => item !== slug) : [...items, slug]),
+    addMany: (slugs) => setQueue((items) => [...new Set([...items, ...slugs])]),
     remove: (slug) => setQueue((items) => items.filter((item) => item !== slug)),
     clear: () => setQueue([]),
     view,

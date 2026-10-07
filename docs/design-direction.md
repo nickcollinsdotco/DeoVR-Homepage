@@ -218,7 +218,7 @@ Why not C: kept as the discovery layer, not the lead.
 
 1. **Featured stage**: a real 360°/180° world you can drag to look around (self-hosted equirect loop for every featured item), with place, title, hook, Immersion Signature and **Step inside**, **Watch in VR**, **Queue** and **Details**. See §14.
 2. **Featured strip**: seven direct alternates instead of a hidden carousel. Pointer dwell or keyboard focus crossfades the stage world to that place; controller-sized targets in headset mode.
-3. **Discovery bar**: **For you / New / Trending**, subject chips and one Immersion filter for field of view, depth, clarity, camera-motion estimate and length. Filter state is linkable in the URL.
+3. **Discovery bar**: **For you / New / Trending**, subject chips and one Immersion filter for field of view, depth, clarity, camera-motion estimate and length. **New to VR?** is a one-tap shortcut into that filter (still camera, 180°, under 10 minutes): the easiest possible first session, for the person most likely to bounce. Filter state is linkable in the URL.
 4. **Discovery grid**: real videos, creator, social proof and the compact Immersion Signature. Dwell/focus turns an immersive card into a look-around portal (flat and premium videos play DeoVR's preview clip instead); selecting a card opens quick view instead of navigating away.
 5. **Editorial chapters** interleaved every two rows: "A quieter kind of somewhere" (still-camera places), **"Where in the world"** (360° places as little planets) and "Look closer" (8K stereo). Then **creators to follow** and a compact footer.
 
@@ -226,7 +226,7 @@ Why not C: kept as the discovery layer, not the lead.
 The dialog is deep-linkable with `?v=<id>`. It opens on the same look-around world as the stage when an equirect source exists; otherwise it holds on the sharp cover. It includes creator, expanded Immersion Signature, comfort/flashing warnings, description, **Watch in DeoVR** / **Queue**, and more like this.
 
 ### Headset queue
-A tray listing queued videos, with total runtime. The queue is saved in this browser only; the UI says it is not synced with an account or headset.
+A tray listing queued videos, with total runtime. **Send to your headset**: the tray shows a short link (`/?view=headset&queue=slug,slug`), short enough to type on a headset keyboard, that opens the same queue in headset view on the other device. This is the desktop-curates/headset-consumes handoff (§4.4) without needing an account. The UI says the queue is saved in this browser and handed over by link, not synced to an account.
 
 ---
 
@@ -345,6 +345,7 @@ After the foundation above, we prototyped two WebGL spikes (`/directions` D and 
 What changed:
 - **Real media.** `scripts/media.mjs` extracts a left-eye equirect still per immersive video and short stage loops from DeoVR's own files, self-hosted (signed source URLs expire after 24h).
 - **Stage = a world.** The featured item is a draggable 180°/360° view with a heading compass. Alternates crossfade the world itself (from the Inside-out spike). "Step inside" expands it to the viewport; "Enter VR" (WebXR, when supported) wraps it around the viewer.
+- **Phones are windows too.** On touch devices the compass becomes a **Tilt to look** toggle: device orientation turns the view, so the phone is a magic window onto the place (the same idea as the headset, in your hand). Opt-in (iOS asks for motion access on the tap), composes with dragging, and switches itself off if no sensor readings arrive.
 - **Portal cards.** Hover, focus or controller dwell turns a card into a look-around window, drawn by one shared canvas behind the page. Flat or premium items keep DeoVR's preview clip.
 - **Where in the world.** 360° places drawn as little planets; the silhouette *is* the field of view. Pointing at one unwraps it.
 - **Quick view** gets the same look-around world: pre-flight means seeing the place, not just reading specs.

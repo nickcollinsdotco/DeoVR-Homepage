@@ -9,12 +9,17 @@ import ImmersionFilter from "@/components/discovery/ImmersionFilter";
 
 const FEEDS: [Feed, string][] = [["for-you", "For you"], ["new", "New"], ["trending", "Trending"]];
 
+// An easy first session: a still camera (the biggest comfort factor), 180° so everything is in
+// front of you, and short. A shortcut into the Immersion filter, not a separate mode.
+const FIRST_TIME = { comfort: "still", fov: "180", length: "short" } as const;
+
 // Two orthogonal facets: *where / what* (intent chips) and *how it feels* (Immersion filter).
-export default function DiscoveryBar({ filters, resultCount, ready, onChange, headsetSearchRef }: {
+export default function DiscoveryBar({ filters, resultCount, ready, onChange, onFeedback, headsetSearchRef }: {
   filters: Filters;
   resultCount: number;
   ready: boolean;
   onChange: (patch: Partial<Filters>, history?: "push" | "replace") => void;
+  onFeedback: (message: string) => void;
   headsetSearchRef: RefObject<HTMLInputElement | null>;
 }) {
   const active: { key: "query" | "intent" | FacetKey; label: string }[] = [];
@@ -23,6 +28,13 @@ export default function DiscoveryBar({ filters, resultCount, ready, onChange, he
   for (const key of ["fov", "depth", "clarity", "comfort", "length"] as const) {
     if (filters[key] !== "all") active.push({ key, label: key === "comfort" ? `Camera: ${facetLabel(key, filters[key])}` : facetLabel(key, filters[key]) });
   }
+
+  const firstTime = (Object.keys(FIRST_TIME) as (keyof typeof FIRST_TIME)[]).every((key) => filters[key] === FIRST_TIME[key]);
+  const toggleFirstTime = () => {
+    if (firstTime) { onChange({ comfort: "all", fov: "all", length: "all" }); return; }
+    onChange(FIRST_TIME);
+    onFeedback("Easy first sessions: still camera, 180° in front of you, under 10 minutes.");
+  };
 
   return (
     <section className="discovery-shell" id="discover" aria-label="Discover videos">
@@ -41,7 +53,10 @@ export default function DiscoveryBar({ filters, resultCount, ready, onChange, he
         <div className="intent-list" role="group" aria-label="Browse by subject">
           {INTENTS.map((intent) => <button key={intent.value} type="button" className="chip" aria-pressed={filters.intent === intent.value} onClick={() => onChange({ intent: intent.value })}>{intent.label}</button>)}
         </div>
-        <ImmersionFilter filters={filters} resultCount={resultCount} onChange={onChange} />
+        <div className="discovery-how">
+          <button type="button" className="chip" aria-pressed={firstTime} onClick={toggleFirstTime}>New to VR?</button>
+          <ImmersionFilter filters={filters} resultCount={resultCount} onChange={onChange} />
+        </div>
         <span className="results-count" aria-live="polite">{ready ? `${resultCount.toLocaleString()} videos` : ""}</span>
       </div>
       {active.length > 0 && <div className="page-width active-filters" aria-label="Active filters">

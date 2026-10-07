@@ -18,6 +18,10 @@ main, .site-footer { position: relative; z-index: 1; }
 .world-compass { position: absolute; z-index: 3; top: .85rem; right: .9rem; display: flex; align-items: center; gap: .55rem; padding: .3rem .7rem .3rem .3rem; border-radius: 999px; background: oklch(0.155 0.006 60 / .62); color: var(--text); font-size: .74rem; font-weight: 500; pointer-events: none; opacity: var(--world, 0); }
 .world-compass svg { width: 1.9rem; height: 1.9rem; }
 .world-wedge { transition: none; }
+/* Phones: the compass is the tilt toggle. Pressed = the world follows the device. */
+.world-compass.is-tilt { min-height: var(--target); padding-right: .9rem; border: 0; font: inherit; font-size: .74rem; font-weight: 500; pointer-events: auto; cursor: pointer; transition: transform var(--d1) var(--ease), color var(--d1) var(--ease); }
+.world-compass.is-tilt:active { transform: scale(.97); }
+.world-compass.is-tilt[aria-pressed="true"] svg { color: var(--accent); }
 .stage-media .stage-scrim, .stage-media .stage-index, .stage-media .stage-media-foot { pointer-events: none; }
 .stage-media .stage-index, .stage-media .stage-media-foot, .stage-media .stage-scrim { z-index: 2; }
 /* Step inside: the world is laid out full-viewport, then FLIPped with transform + clip-path (GPU only). */

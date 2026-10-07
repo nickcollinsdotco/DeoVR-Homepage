@@ -35,7 +35,7 @@
   .feed-tabs { order: 0; }
   .intent-list { order: 2; flex-basis: 100%; }
   .bar-divider { display: none; }
-  .immersion-filter { order: 1; margin-left: auto; }
+  .discovery-how { order: 1; margin-left: auto; }
   .results-count { display: none; }
   .filter-popover { position: fixed; inset: auto .75rem .75rem; width: auto; max-height: min(78vh, 42rem); overflow-y: auto; box-shadow: 0 -20px 80px #0008; }
   .creator-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }

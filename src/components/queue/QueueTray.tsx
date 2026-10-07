@@ -18,9 +18,17 @@ export default function QueueTray({
   onFeedback: (message: string) => void;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const { queue, remove, clear } = useAppState();
+  const { queue, remove, clear, view } = useAppState();
   const queuedVideos = queue.map((slug) => VIDEOS.find((video) => video.slug === slug)).filter((video): video is Video => Boolean(video));
   const totalSeconds = queuedVideos.reduce((sum, video) => sum + video.durationSec, 0);
+  // Handoff without an account: a short link that opens this queue in headset view. Commas stay
+  // literal (valid in a query) so the link is short enough to type on a headset keyboard.
+  const handoff = typeof window === "undefined" ? "" : `${window.location.origin}/?view=headset&queue=${queuedVideos.map((video) => video.slug).join(",")}`;
+  const copyHandoff = () => {
+    void navigator.clipboard?.writeText(handoff)
+      .then(() => onFeedback("Link copied. Open it in your headset's browser."))
+      .catch(() => onFeedback("Couldn't copy. Select the link and copy it instead."));
+  };
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -52,7 +60,15 @@ export default function QueueTray({
           </div>
           <div className="queue-total"><span>{queuedVideos.length} {queuedVideos.length === 1 ? "experience" : "experiences"}</span><span>{formatDuration(totalSeconds)} total</span></div>
         </>}
-        <p className="queue-disclaimer">This prototype saves your queue in this browser. It is not synced to a DeoVR account or headset.</p>
+        {queuedVideos.length > 0 && view === "desktop" && <div className="queue-handoff">
+          <span className="eyebrow">Send to your headset</span>
+          <p>Open this link in your headset&apos;s browser and the queue is there, in headset view.</p>
+          <div className="queue-handoff-row">
+            <code>{handoff.replace(/^https?:\/\//, "")}</code>
+            <button className="button button-outline" type="button" onClick={copyHandoff}><Icon name="link" />Copy link</button>
+          </div>
+        </div>}
+        <p className="queue-disclaimer">This prototype saves your queue in this browser and hands it over by link. It is not synced to a DeoVR account.</p>
         {queuedVideos.length > 0 && <div className="queue-actions">
           <button className="button button-quiet" type="button" onClick={() => { clear(); onFeedback("Your headset queue is clear."); }}>Clear queue</button>
           <a className="button button-primary" href="https://deovr.com/" target="_blank" rel="noreferrer"><Icon name="headset" />Open DeoVR</a>

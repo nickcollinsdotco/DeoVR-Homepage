@@ -12,7 +12,7 @@ Companion to `docs/design-direction.md` (read that first). Last updated: 2026-10
 - **Immersive layer, lazy.** three.js loads via dynamic import on idle, never on the critical path. If WebGL is unavailable, every surface falls back to covers and DeoVR's flat preview clips.
 - **State**
   - Filters, feed and quick view → **URL search params** (`?feed=trending&intent=travel&fov=360&comfort=still&v=5fy5b3`), restored after hydration and on back/forward.
-  - Headset queue + view mode → React context persisted to `localStorage` (`AppProviders`).
+  - Headset queue + view mode → React context persisted to `localStorage` (`AppProviders`). A handoff link (`?view=headset&queue=slug,slug`) merges into the receiving browser's queue, then the param is removed.
   - Portals → a tiny module-level registry (`lib/immersive/portals.ts`) that cards write to and one canvas reads from, so cards never import three.js.
 - **Dependencies:** `next`, `react`, `three` (lazy), `clsx`, `@vercel/analytics` (page views on the deploy, loaded after the page); dev-only `ffmpeg-static` for the media script. No UI kit, no icon pack.
 
@@ -62,13 +62,13 @@ scripts/
 |---|---|---|
 | `HomePage` | Composes the page; owns filters (mirrored to URL), quick view (`?v=`), toasts | `Feed` is keyed by filters, so paging and previews reset on change |
 | `Stage` | Featured item: world, place, title, hook, signature, actions; seven alternates | Alternates select on dwell (220ms) or focus; arrow keys rove |
-| `WorldStage` | Draggable 180°/360° view, crossfade between worlds, compass, Step inside (FLIP to viewport), Enter VR | Keyboard arrows look around; Esc steps back; idle drift only on 360° and never under reduced motion |
+| `WorldStage` | Draggable 180°/360° view, crossfade between worlds, compass, Step inside (FLIP to viewport), Enter VR, tilt to look (phones) | Keyboard arrows look around; Esc steps back; idle drift only on 360° and never under reduced motion; tilt applies device-orientation deltas, so it composes with drag |
 | `PortalCanvas` | One fixed canvas *behind* the page draws every live portal into its card's rectangle | Covers fade out via `--portal` to reveal it; rounded corners are clipped in the shader |
 | `VideoCard` | Cover, duration, signature, title, creator, stats; portal on hover/focus/dwell, else DeoVR preview clip | Focus without a pointer sweeps the view gently |
 | `PlacesChapter` | 360° places as little planets; unwrap to a window on intent | The silhouette is the field of view |
-| `DiscoveryBar` / `ImmersionFilter` | Feed tabs, intent chips (*where*), Immersion facets (*how it feels*), active filter chips | Instant apply; counts in an `aria-live` region |
+| `DiscoveryBar` / `ImmersionFilter` | Feed tabs, intent chips (*where*), Immersion facets (*how it feels*), "New to VR?" preset, active filter chips | Instant apply; counts in an `aria-live` region |
 | `QuickView` | Pre-flight dialog: look-around world, expanded signature, comfort note, actions, similar | `<dialog>`, focus on Close, deep link |
-| `QueueTray` | Headset queue with total runtime | Honest copy: saved in this browser only |
+| `QueueTray` | Headset queue with total runtime; "Send to your headset" handoff link | Honest copy: saved in this browser, handed over by link |
 | `HeadsetDock` | Bottom-centre labelled navigation in headset view | ≥ 64px targets |
 
 ---
