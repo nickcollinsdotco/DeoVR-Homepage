@@ -21,7 +21,7 @@ export default function PlacesChapter({ onOpen }: { onOpen: (video: Video) => vo
       <div className="chapter-heading">
         <div>
           <h2 id="places-title">Where in the world</h2>
-          <p>Each sphere is a whole place, seen all the way around. Point at one to unwrap it.</p>
+          <p>Each sphere is a whole place, seen all the way around. <span className="hint-pointer">Point at one to unwrap it.</span><span className="hint-touch">Tap one to look around inside.</span></p>
         </div>
       </div>
       <ul className="places-grid">

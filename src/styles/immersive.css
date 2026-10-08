@@ -45,6 +45,9 @@ html.world-open { overflow: hidden; }
 .button-icon { width: var(--target); padding: 0; }
 
 /* Where in the world: planets */
+/* Pointing unwraps a planet; touch has no hover, so a tap opens the look-around quick view instead. */
+.hint-touch { display: none; }
+@media (hover: none) { .hint-pointer { display: none; } .hint-touch { display: inline; } }
 .places-chapter { margin-top: clamp(2.5rem, 5vw, 4rem); }
 .places-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 1.15rem; margin: 0; padding: 0; list-style: none; }
 .planet-card { min-width: 0; }

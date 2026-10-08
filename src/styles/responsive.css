@@ -78,7 +78,8 @@
   .immersion-trigger { min-height: 2.35rem; padding-inline: .7rem; font-size: .77rem; }
   .chip-row .chip { min-height: 2.15rem; padding-inline: .68rem; font-size: .72rem; }
   .feed-section { padding-top: 1.2rem; }
-  .feed-heading { align-items: start; }
+  /* The count becomes an eyebrow above the title instead of squeezing it into two lines. */
+  .feed-heading { flex-direction: column-reverse; align-items: start; gap: .55rem; }
   .feed-heading h2 { font-size: 1.8rem; }
   .video-grid { grid-template-columns: 1fr; gap: 2.75rem; }
   .card-media { aspect-ratio: 16 / 9; }
