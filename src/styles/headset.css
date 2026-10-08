@@ -23,8 +23,7 @@ html[data-view="headset"] .feed-tab { min-height: var(--target); padding-inline:
 html[data-view="headset"] .chip { min-height: calc(var(--target) - .25rem); padding-inline: 1rem; font-size: .83rem; }
 html[data-view="headset"] .video-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2.6rem 1.45rem; }
 html[data-view="headset"] .card-title { font-size: .98rem; }
-html[data-view="headset"] .immersion-signature { gap: .5rem .85rem; font-size: .8rem; }
-html[data-view="headset"] .signature-icon { width: 1.2rem; height: 1.2rem; }
+html[data-view="headset"] .immersion-signature { gap: .5rem 0; font-size: .8rem; }
 html[data-view="headset"] .card-queue { width: var(--target); height: var(--target); opacity: 1; }
 html[data-view="headset"] .chapter-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 html[data-view="headset"] .chapter-cards .video-card:nth-child(n+4) { display: none; }
@@ -47,7 +46,7 @@ html[data-view="headset"] .feed-section { scroll-snap-type: y proximity; }
 
 @media (max-width: 900px) {
   html[data-view="headset"] .stage-layout { grid-template-columns: 1fr; gap: 1.4rem; }
-  html[data-view="headset"] .stage-title { max-width: 14ch; font-size: clamp(3.2rem, 8vw, 5rem); }
+  html[data-view="headset"] .stage-title { font-size: clamp(3.2rem, 8vw, 5rem); }
   html[data-view="headset"] .video-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   html[data-view="headset"] .chapter-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   html[data-view="headset"] .discovery-bar { flex-wrap: wrap; padding-block: .55rem; }

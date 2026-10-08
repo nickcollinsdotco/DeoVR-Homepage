@@ -237,15 +237,15 @@ DeoVR's distinctive design asset is a compact, consistent, language-light descri
 
 | Facet | Shown as | Values |
 |---|---|---|
-| Field of view | **Arc glyph** (a half circle for 180°, a full ring for 360°) + label | 180°, 360°, Flat |
+| Field of view | Label, emphasised (brightest item) | 180°, 360°, Flat |
 | Depth | `3D` / `2D` | stereo vs mono |
-| Clarity | `8K` / `6K` / `5K` / `4K` (+ `60fps` when ≥ 50) | from source resolution |
-| Comfort | Small dot scale + word | Still · Gentle · Moving (+ flashing-light flag) |
+| Clarity | `8K` / `6K` / `5K` / `4K` (+ `60fps` when ≥ 50; `8K 60fps` on compact rows) | from source resolution |
+| Comfort | Word (`Still camera` on compact rows, labelled "Camera motion" in quick view) | Still · Gentle · Moving (+ flashing-light flag) |
 | Length | `12:40` | duration |
 
-Rules: same order everywhere; on cards it's a single line of compact chips; in quick view each item expands with a one-line plain-language explanation; in headset view, chips grow and always show labels (never glyph-only).
+Rules: **text only, no glyphs**, and same order everywhere. On cards and the stage it's one line of plain values separated by `·`; in quick view each item expands with a one-line plain-language explanation; in headset view the text grows.
 
-The arc glyph is the hero detail. Scanning a grid, you can see "full sphere" vs "half sphere" before reading anything.
+Glyphs were tried first (an arc for field of view, `2D`/`8K` badges, motion bars), but most just repeated their own label ("2D 2D", "8K 8K") and competed with it. Without real icons for every facet, consistent text reads cleaner than a mix.
 
 ---
 

@@ -13,7 +13,7 @@ Every VR video is a window to somewhere. The homepage is a **Viewfinder** made l
 - **Type**: Inter for UI/body (weights 400/500/600, `tnum` for numbers). Instrument Sans 600 for display only at large sizes, tracked slightly tight (`--display-tracking`, -0.02em), never cramped.
 - **3D only to show the content's real geometry** (equirect worlds, portals, little planets, WebXR on request). See design-direction §14.
 - **Depth via light and scale**, not shadows/blur. Radii: 8px cards, pill chips/buttons only.
-- **Immersion Signature is consistent everywhere**: same order (FOV · depth · clarity/fps · comfort · length), same glyphs. Never glyph-only in headset view.
+- **Immersion Signature is consistent everywhere**: same order (FOV · depth · clarity/fps · comfort · length), text only (no glyphs: they just repeated their labels).
 - **Focus is preview**: dwell or keyboard focus on a featured alternate crossfades the stage world. Dwell or focus on an immersive card opens a portal inside it (one at a time). Click a card for quick view, not navigation.
 - **Never show a blurry frame**: worlds come from self-hosted equirect loops and stills; without one, show the sharp cover. 300p DeoVR previews only play at card size. See `docs/implementation-plan.md` §4.
 - Five directions were prototyped in code and live in `public/directions/` (served at `/directions`). The shipped page is B's stage + C's grid + the D/E spatial layer (design-direction §6, §14). Don't reintroduce A's rails or E's single-shelf layout without updating the design doc.

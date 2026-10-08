@@ -28,8 +28,7 @@
   .stage-layout { grid-template-columns: 1fr; align-items: start; gap: 1.25rem; }
   .stage-media { aspect-ratio: 16 / 9; }
   .stage-info { grid-template-columns: 1fr; gap: .8rem; }
-  .stage-title { max-width: 12ch; font-size: clamp(2.7rem, 8vw, 4.3rem); }
-  .stage-hook { max-width: 55ch; }
+  .stage-title { font-size: clamp(2.7rem, 8vw, 4.3rem); }
   .discovery-shell { top: 4rem; margin-top: 2rem; }
   .discovery-bar { flex-wrap: wrap; align-items: center; padding-block: .55rem; }
   .feed-tabs { order: 0; }
@@ -39,7 +38,10 @@
   .results-count { display: none; }
   .filter-popover { position: fixed; inset: auto .75rem .75rem; width: auto; max-height: min(78vh, 42rem); overflow-y: auto; box-shadow: 0 -20px 80px #0008; }
   .creator-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .signature-expanded { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  /* Five facts never leave an empty cell: 3 + 2 on a six-track grid (the last row's cells widen). */
+  .signature-expanded { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .signature-expanded > * { grid-column: span 2; }
+  .signature-expanded > :nth-child(n+4) { grid-column: span 3; }
 }
 
 @media (max-width: 640px) {
@@ -65,7 +67,7 @@
   .stage-section { padding-top: 1rem; }
   .stage-media { aspect-ratio: 5 / 3; }
   .stage-info { gap: .65rem; }
-  .stage-title { max-width: 9ch; font-size: clamp(2.4rem, 12vw, 3.7rem); }
+  .stage-title { font-size: clamp(2.4rem, 12vw, 3.7rem); }
   .stage-hook { font-size: .88rem; }
   .stage-actions .button { min-height: 2.85rem; font-size: .8rem; }
   .stage-alternates { display: flex; gap: .65rem; overflow-x: auto; margin-right: calc(var(--gutter) * -1); padding-right: var(--gutter); padding-bottom: .25rem; scrollbar-width: none; }
@@ -86,7 +88,7 @@
   .card-queue { width: 2.75rem; height: 2.75rem; opacity: 1; }
   .card-copy { gap: .5rem; padding-top: .8rem; }
   .card-title { font-size: .92rem; }
-  .immersion-signature { gap: .35rem .62rem; font-size: .7rem; }
+  .immersion-signature { font-size: .7rem; }
   .chapter-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.75rem .65rem; }
   .chapter-cards .video-card:nth-child(n+3) { display: none; }
   .chapter-heading { align-items: start; }
@@ -98,6 +100,8 @@
   .quickview-media { aspect-ratio: 16 / 9; }
   .quickview-body { gap: .9rem; padding: 1.05rem 1rem 1.35rem; }
   .signature-expanded { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .signature-expanded > *, .signature-expanded > :nth-child(n+4) { grid-column: auto; }
+  .signature-expanded > :last-child { grid-column: 1 / -1; }
   .more-like-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .more-like-card:nth-child(n+3) { display: none; }
   .queue-dialog { inset: auto .5rem .5rem; width: auto; max-height: 82dvh; }

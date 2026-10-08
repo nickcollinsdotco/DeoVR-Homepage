@@ -17,8 +17,8 @@
 .eyebrow { color: var(--text-3); font-size: .7rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
 .eyebrow-dot { display: inline-block; width: .38rem; height: .38rem; margin-right: .45rem; border-radius: 50%; background: var(--accent); vertical-align: .08em; }
 .stage-place { margin: 0; color: var(--text-2); font-size: .9rem; }
-.stage-title { max-width: 8ch; margin: -.2rem 0 0; font-family: var(--font-instrument), var(--font-inter), sans-serif; font-size: clamp(2.6rem, 4.2vw, 4.75rem); font-weight: 600; line-height: 1; letter-spacing: var(--display-tracking); text-wrap: balance; }
-.stage-hook { max-width: 35ch; margin: 0; color: var(--text-2); font-size: .98rem; line-height: 1.55; text-wrap: pretty; }
+.stage-title { margin: -.2rem 0 0; font-family: var(--font-instrument), var(--font-inter), sans-serif; font-size: clamp(2.6rem, 4.2vw, 4.75rem); font-weight: 600; line-height: 1; letter-spacing: var(--display-tracking); text-wrap: balance; }
+.stage-hook { margin: 0; color: var(--text-2); font-size: .98rem; line-height: 1.55; text-wrap: pretty; }
 .stage-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
 .stage-actions .button { min-height: 3rem; }
 .stage-channel { display: flex; align-items: center; gap: .6rem; color: var(--text-2); font-size: .82rem; }

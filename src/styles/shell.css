@@ -25,5 +25,5 @@
 .library-popover a { display: flex; align-items: center; min-height: 2.75rem; padding: 0 .8rem; border-radius: 5px; color: var(--text-2); font-size: .875rem; }
 .library-popover a:hover { background: var(--surface-3); color: var(--text); }
 .site-footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-block: 1.5rem 2.5rem; border-top: 1px solid var(--line); color: var(--text-3); font-size: .72rem; }
-.site-footer a { color: var(--text-2); }
+.site-footer a { display: inline-flex; align-items: center; gap: .25rem; color: var(--text-2); white-space: nowrap; }
 .site-footer a:hover { color: var(--text); }

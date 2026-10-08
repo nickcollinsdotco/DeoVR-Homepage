@@ -1,6 +1,8 @@
 /* Element defaults, focus, accessibility helpers, reduced motion. */
 
 *, *::before, *::after { box-sizing: border-box; }
+/* Text only wraps when it must, and then without a lonely last word. Avoid ch caps on short copy. */
+p { text-wrap: pretty; }
 html { scroll-behavior: smooth; background: var(--bg); }
 body {
   min-width: 320px;
