@@ -10,7 +10,7 @@
 .chapter-cards .video-card .card-title { font-size: .86rem; }
 .empty-state { grid-column: 1 / -1; display: grid; justify-items: center; gap: .6rem; padding: 5rem 1.5rem; border-top: 1px solid var(--line); text-align: center; }
 .empty-state > svg { width: 2rem; height: 2rem; color: var(--text-3); }
-.empty-state h2 { margin: .3rem 0 0; font-family: var(--font-archivo), sans-serif; font-size: 1.8rem; letter-spacing: -.04em; }
+.empty-state h2 { margin: .3rem 0 0; font-family: var(--font-instrument), var(--font-inter), sans-serif; font-size: 1.8rem; font-weight: 600; letter-spacing: -.02em; }
 .empty-state p { max-width: 38ch; margin: 0; color: var(--text-2); font-size: .9rem; }
 .load-more { display: flex; justify-content: center; padding: 2.5rem 0 1rem; }
 .load-more .button { min-width: 12rem; }

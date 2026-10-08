@@ -19,7 +19,7 @@
 .quickview-close { position: absolute; z-index: 5; top: .8rem; right: .8rem; display: grid; width: 2.75rem; height: 2.75rem; place-items: center; border: 1px solid #ffffff40; border-radius: 50%; background: #141312cb; color: var(--text); cursor: pointer; }
 .quickview-close svg { width: 1.2rem; height: 1.2rem; }
 .quickview-body { display: grid; gap: 1.15rem; padding: 1.45rem 1.65rem 1.65rem; }
-.quickview-title { margin: 0; font-family: var(--font-archivo), sans-serif; font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 650; letter-spacing: -.04em; line-height: 1.05; }
+.quickview-title { margin: 0; font-family: var(--font-instrument), var(--font-inter), sans-serif; font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 600; letter-spacing: var(--display-tracking); line-height: 1.05; }
 .quickview-subtitle { margin: .35rem 0 0; color: var(--text-3); font-size: .8rem; }
 .quickview-description { display: -webkit-box; overflow: hidden; max-width: 72ch; margin: 0; color: var(--text-2); font-size: .88rem; line-height: 1.55; white-space: pre-line; -webkit-box-orient: vertical; -webkit-line-clamp: 4; }
 .motion-note { display: flex; align-items: flex-start; gap: .55rem; padding: .7rem .8rem; border-left: 2px solid var(--moving); background: color-mix(in oklch, var(--moving) 8%, var(--surface-2)); color: var(--text-2); font-size: .78rem; }

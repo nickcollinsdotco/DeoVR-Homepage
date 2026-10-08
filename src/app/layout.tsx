@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, Inter } from "next/font/google";
+import { Inter, Instrument_Sans } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import { AppProviders } from "@/components/providers/AppProviders";
@@ -10,10 +10,10 @@ const inter = Inter({
   display: "swap",
 });
 
-const archivo = Archivo({
+const instrument = Instrument_Sans({
   subsets: ["latin"],
-  axes: ["wdth"],
-  variable: "--font-archivo",
+  weight: ["600"],
+  variable: "--font-instrument",
   display: "swap",
 });
 
@@ -32,7 +32,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${archivo.variable}`}>
+    <html lang="en" className={`${inter.variable} ${instrument.variable}`}>
       <body>
         <AppProviders>{children}</AppProviders>
         <Analytics />

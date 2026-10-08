@@ -13,6 +13,7 @@ import Stage from "@/components/stage/Stage";
 import DiscoveryBar from "@/components/discovery/DiscoveryBar";
 import Feed from "@/components/discovery/Feed";
 import CreatorsRow from "@/components/chapters/CreatorsRow";
+import PlacesChapter from "@/components/chapters/PlacesChapter";
 import QuickView from "@/components/quickview/QuickView";
 import QueueTray from "@/components/queue/QueueTray";
 import PortalCanvas from "@/components/immersive/PortalCanvas";
@@ -114,6 +115,7 @@ export default function HomePage() {
       <TopBar query={filters.query} onQuery={(query) => changeFilters({ query }, "replace")} searchRef={searchRef} onOpenQueue={() => setQueueOpen(true)} />
       <main id="top">
         <Stage selected={stageVideo} onSelect={setStageVideo} onOpen={openQuickView} onFeedback={announce} />
+        <PlacesChapter onOpen={openQuickView} />
         <DiscoveryBar filters={filters} resultCount={matching.length} ready={ready} onChange={changeFilters} onFeedback={announce} headsetSearchRef={headsetSearchRef} />
         <Feed key={JSON.stringify(filters)} videos={matching} filters={filters} onChange={changeFilters} onOpen={openQuickView} onFeedback={announce} />
         <CreatorsRow />

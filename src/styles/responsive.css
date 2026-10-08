@@ -15,8 +15,8 @@
   .video-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .chapter-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .discovery-bar { gap: .55rem; }
-  .intent-list { gap: .32rem; }
-  .intent-list .chip { padding-inline: .65rem; }
+  .chip-row, .intent-list { gap: .32rem; }
+  .chip-row .chip { padding-inline: .65rem; }
 }
 
 @media (max-width: 820px) {
@@ -33,9 +33,9 @@
   .discovery-shell { top: 4rem; margin-top: 2rem; }
   .discovery-bar { flex-wrap: wrap; align-items: center; padding-block: .55rem; }
   .feed-tabs { order: 0; }
-  .intent-list { order: 2; flex-basis: 100%; }
-  .bar-divider { display: none; }
-  .discovery-how { order: 1; margin-left: auto; }
+  .chip-row { order: 2; flex-basis: 100%; }
+  .discovery-bar > .bar-divider { display: none; }
+  .immersion-filter { order: 1; margin-left: auto; }
   .results-count { display: none; }
   .filter-popover { position: fixed; inset: auto .75rem .75rem; width: auto; max-height: min(78vh, 42rem); overflow-y: auto; box-shadow: 0 -20px 80px #0008; }
   .creator-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -76,17 +76,17 @@
   .discovery-bar { column-gap: .65rem; }
   .feed-tab { min-height: 2.5rem; padding-inline: .52rem; font-size: .79rem; }
   .immersion-trigger { min-height: 2.35rem; padding-inline: .7rem; font-size: .77rem; }
-  .intent-list .chip { min-height: 2.15rem; padding-inline: .68rem; font-size: .72rem; }
+  .chip-row .chip { min-height: 2.15rem; padding-inline: .68rem; font-size: .72rem; }
   .feed-section { padding-top: 1.2rem; }
   .feed-heading { align-items: start; }
   .feed-heading h2 { font-size: 1.8rem; }
-  .video-grid { grid-template-columns: 1fr; gap: 1.65rem; }
+  .video-grid { grid-template-columns: 1fr; gap: 2.75rem; }
   .card-media { aspect-ratio: 16 / 9; }
   .card-queue { width: 2.75rem; height: 2.75rem; opacity: 1; }
-  .card-copy { gap: .42rem; }
+  .card-copy { gap: .5rem; padding-top: .8rem; }
   .card-title { font-size: .92rem; }
   .immersion-signature { gap: .35rem .62rem; font-size: .7rem; }
-  .chapter-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem .65rem; }
+  .chapter-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.75rem .65rem; }
   .chapter-cards .video-card:nth-child(n+3) { display: none; }
   .chapter-heading { align-items: start; }
   .chapter-heading h2 { font-size: 1.8rem; }

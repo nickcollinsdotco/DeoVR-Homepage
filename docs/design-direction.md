@@ -99,7 +99,7 @@ Not gold or glass. It means **confidence and calm**: the content gets the space,
 | **Discovery model** | Browse horizontally by curated theme; little user-driven filtering. |
 | **Hero** | Full-viewport looping preview with large title and Play. |
 | **Visual language** | Deep black, big cinematic type, edge-to-edge imagery. |
-| **Typography** | Condensed display face for titles, neutral sans for UI. |
+| **Typography** | Calm, confident grotesk display face for titles, neutral sans for UI. |
 | **Interaction** | Hover-expand cards, rail scrolling with arrows. |
 | **Motion** | Slow crossfades, hero parallax. |
 | **Desktop** | Strong. Familiar, polished. |
@@ -218,9 +218,10 @@ Why not C: kept as the discovery layer, not the lead.
 
 1. **Featured stage**: a real 360°/180° world you can drag to look around (self-hosted equirect loop for every featured item), with place, title, hook, Immersion Signature and **Step inside**, **Watch in VR**, **Queue** and **Details**. See §14.
 2. **Featured strip**: seven direct alternates instead of a hidden carousel. Pointer dwell or keyboard focus crossfades the stage world to that place; controller-sized targets in headset mode.
-3. **Discovery bar**: **For you / New / Trending**, subject chips and one Immersion filter for field of view, depth, clarity, camera-motion estimate and length. **New to VR?** is a one-tap shortcut into that filter (still camera, 180°, under 10 minutes): the easiest possible first session, for the person most likely to bounce. Filter state is linkable in the URL.
-4. **Discovery grid**: real videos, creator, social proof and the compact Immersion Signature. Dwell/focus turns an immersive card into a look-around portal (flat and premium videos play DeoVR's preview clip instead); selecting a card opens quick view instead of navigating away.
-5. **Editorial chapters** interleaved every two rows: "A quieter kind of somewhere" (still-camera places), **"Where in the world"** (360° places as little planets) and "Look closer" (8K stereo). Then **creators to follow** and a compact footer.
+3. **Where in the world**: 360° places drawn as little planets; point at one to unwrap it. It sits straight under the stage, not buried in the grid, because it's the quickest "try it" moment on the page. On phones it's one swipeable row so it doesn't push the grid down.
+4. **Discovery bar**: **For you / New / Trending**, subject chips and one Immersion filter for field of view, depth, clarity, camera-motion estimate and length. **New to VR?** is a one-tap shortcut into that filter (still camera, 180°, under 10 minutes): the easiest possible first session, for the person most likely to bounce. It leads the chip row (not beside Immersion) so the phone bar stays two rows: feed tabs + Immersion, then chips. Filter state is linkable in the URL.
+5. **Discovery grid**: real videos, creator, social proof and the compact Immersion Signature. Dwell/focus turns an immersive card into a look-around portal (flat and premium videos play DeoVR's preview clip instead); selecting a card opens quick view instead of navigating away.
+6. **Editorial chapters** at whole-row breaks in the grid: "A quieter kind of somewhere" (still-camera places) and "Look closer" (8K stereo). Then **creators to follow** and a compact footer.
 
 ### Quick view (pre-flight)
 The dialog is deep-linkable with `?v=<id>`. It opens on the same look-around world as the stage when an equirect source exists; otherwise it holds on the sharp cover. It includes creator, expanded Immersion Signature, comfort/flashing warnings, description, **Watch in DeoVR** / **Queue**, and more like this.
@@ -262,7 +263,7 @@ Editorial, cinematic and calm. Content-led. Restrained chrome. Think of dark cin
 
 ### Typography
 - **UI/body: Inter.** Continuity with DeoVR, excellent hinting and legibility in a low-PPD headset, tabular numerals (`tnum`) for durations and counts. Weights 400/500/600 only; no thin weights (they shimmer in a headset).
-- **Display: Archivo (variable, with width axis).** Used semi-condensed and heavy for stage titles, place names and chapter headings, which gives a poster/film-programme feel without looking like a novelty font. Sparingly: only at large sizes.
+- **Display: Instrument Sans 600.** Used for stage titles, place names and chapter headings, tracked slightly tighter than default (-0.02em, the `--display-tracking` token) but never cramped. It's clean, confident and a little wide: a calm, grown-up film-title feel that is clearly distinct from Inter without fighting it. Archivo was used first, condensed, heavy and tightly tracked, and it read cramped and immature. It lost a side-by-side against Inter Tight, Geist, Schibsted Grotesk, Hanken, Host, Funnel, Familjen, Onest and Fraunces. Sparingly: only at large sizes.
 - Spec labels: Inter 500, small caps feel via uppercase + +4% tracking at ≥ 11px desktop / ≥ 15px headset.
 - Scale (desktop): 12 / 14 / 16 / 20 / 28 / 40 / 64 / 88. Headset view: the whole scale × ~1.3, minimum 16px.
 

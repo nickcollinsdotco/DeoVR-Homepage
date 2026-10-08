@@ -12,7 +12,6 @@ import { useAppState } from "@/components/providers/AppProviders";
 import { Icon } from "@/components/ui/Icons";
 import VideoCard from "@/components/video/VideoCard";
 import EditorialChapter from "@/components/chapters/EditorialChapter";
-import PlacesChapter from "@/components/chapters/PlacesChapter";
 
 const PAGE = 24;
 // Chapters break the grid every 12 cards: whole rows at 4, 3, 2 and 1 columns.
@@ -28,6 +27,7 @@ function feedTitle(filters: Filters) {
 }
 
 // The grid. With no filters applied, editorial chapters break it at whole-row boundaries.
+// "Where in the world" sits above the discovery bar instead, right under the stage.
 // Remount (via `key`) whenever filters change, which resets paging and the active preview.
 export default function Feed({ videos, filters, onChange, onOpen, onFeedback }: {
   videos: Video[];
@@ -95,9 +95,7 @@ export default function Feed({ videos, filters, onChange, onOpen, onFeedback }: 
               <EditorialChapter title="A quieter kind of somewhere" description="Still-camera places for when you want to slow down." action="Find calm places" onAction={() => onChange({ comfort: "still" })}>
                 {calm.map(card)}
               </EditorialChapter>
-              {shown.slice(CHUNK, CHUNK * 2).map(card)}
-              <PlacesChapter onOpen={onOpen} />
-              {shown.slice(CHUNK * 2).map(card)}
+              {shown.slice(CHUNK).map(card)}
               <EditorialChapter title="Look closer" description="High-resolution stereo views where fine detail earns the extra clarity." action="Explore 8K 3D" onAction={() => onChange({ clarity: "8", depth: "3D" })}>
                 {sharp.map(card)}
               </EditorialChapter>

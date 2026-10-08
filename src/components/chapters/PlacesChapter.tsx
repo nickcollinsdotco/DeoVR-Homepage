@@ -11,12 +11,13 @@ import { useAppState } from "@/components/providers/AppProviders";
 type Place = { place: string; country: string; video: Video };
 
 // 360° places drawn as little planets: the silhouette *is* the field of view. Point at one and it
-// unwraps into a window you can look around in; select it for the full quick view.
+// unwraps into a window you can look around in; select it for the full quick view. It sits right
+// under the stage (not inside the grid): the most immediate taste of "every video is a place".
 export default function PlacesChapter({ onOpen }: { onOpen: (video: Video) => void }) {
   const places = getPlaces();
   if (places.length < 3) return null;
   return (
-    <section className="places-chapter" aria-labelledby="places-title">
+    <section className="places-chapter page-width" aria-labelledby="places-title">
       <div className="chapter-heading">
         <div>
           <h2 id="places-title">Where in the world</h2>

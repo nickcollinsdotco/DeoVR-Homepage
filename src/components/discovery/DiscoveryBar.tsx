@@ -50,13 +50,16 @@ export default function DiscoveryBar({ filters, resultCount, ready, onChange, on
           {FEEDS.map(([feed, label]) => <button key={feed} type="button" aria-pressed={filters.feed === feed} className="feed-tab" onClick={() => onChange({ feed })}>{label}</button>)}
         </div>
         <span className="bar-divider" aria-hidden="true" />
-        <div className="intent-list" role="group" aria-label="Browse by subject">
-          {INTENTS.map((intent) => <button key={intent.value} type="button" className="chip" aria-pressed={filters.intent === intent.value} onClick={() => onChange({ intent: intent.value })}>{intent.label}</button>)}
-        </div>
-        <div className="discovery-how">
+        {/* "New to VR?" leads the chip row (first thing seen, scrolls with the chips) so the bar
+            stays two rows on phones: feed + Immersion, then chips. */}
+        <div className="chip-row">
           <button type="button" className="chip" aria-pressed={firstTime} onClick={toggleFirstTime}>New to VR?</button>
-          <ImmersionFilter filters={filters} resultCount={resultCount} onChange={onChange} />
+          <span className="bar-divider" aria-hidden="true" />
+          <div className="intent-list" role="group" aria-label="Browse by subject">
+            {INTENTS.map((intent) => <button key={intent.value} type="button" className="chip" aria-pressed={filters.intent === intent.value} onClick={() => onChange({ intent: intent.value })}>{intent.label}</button>)}
+          </div>
         </div>
+        <ImmersionFilter filters={filters} resultCount={resultCount} onChange={onChange} />
         <span className="results-count" aria-live="polite">{ready ? `${resultCount.toLocaleString()} videos` : ""}</span>
       </div>
       {active.length > 0 && <div className="page-width active-filters" aria-label="Active filters">
