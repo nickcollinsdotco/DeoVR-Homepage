@@ -1,6 +1,6 @@
 # DeoVR Homepage: Redesign Prototype
 
-A redesign of the [deovr.com](https://deovr.com) homepage as a dark, VR-aware discovery experience, built for the DeoVR / SLR design challenge.
+Prototype redesign of the [deovr.com](https://deovr.com) homepage as a dark, VR-aware discovery experience.
 
 **Live:** [deo-vr-homepage.vercel.app](https://deo-vr-homepage.vercel.app) · [headset view](https://deo-vr-homepage.vercel.app/?view=headset) · [directions explored](https://deo-vr-homepage.vercel.app/directions)
 
